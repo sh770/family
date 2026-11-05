@@ -386,7 +386,7 @@
     <section class="notifications" aria-label="הגדרות התראות">
       <div class="notification-info">
         <strong>🔔 תזכורות על אירועים</strong>
-        <small>ההתראות בגרסה זו נבדקות כשהאתר פתוח בדפדפן</small>
+        <small>תזכורות אוטומטיות דרך Cloudflare, גם כשהאתר סגור</small>
       </div>
       <label style="flex: 0 1 180px;">
         מתי להזכיר?
@@ -397,7 +397,7 @@
           <option value="7">שבוע לפני</option>
         </select>
       </label>
-      <button type="button" id="enableNotifications">בדיקת והפעלת התראות</button>
+      <button type="button" id="enableNotifications">הפעלת התראות</button>
       <span id="notificationStatus" role="status">ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.</span>
     </section>
 
@@ -408,7 +408,7 @@
     <section id="events" aria-live="polite"></section>
     <p class="note">
       החישוב מתבצע בדפדפן לפי הלוח העברי המובנה. אירועים ללא שנת לידה או נישואין מחושבים לפי היום והחודש בלבד.
-      התאריך הלועזי מציין את היום שבו חל התאריך העברי, החל מהיום. התראות בגרסה הנוכחית נבדקות כשהאתר פתוח; לקבלת התראות כשהאתר סגור נדרש שירות Push נוסף.
+      התאריך הלועזי מציין את היום שבו חל התאריך העברי, החל מהיום. התזכורות נשלחות באמצעות שירות Push, בהתאם למספר הימים שנבחר ובהרשאת הדפדפן.
     </p>
   </main>
 
@@ -1567,97 +1567,205 @@
       applyTheme(nextTheme);
     });
 
-    // שמירת הגדרות ההתראות בדפדפן ובדיקת הרשאות קיימות
+    // הגדרות החיבור לשירות ההתראות של Cloudflare
     const reminderDaysSelect = document.getElementById("reminderDays");
     const notificationButton = document.getElementById("enableNotifications");
     const notificationStatus = document.getElementById("notificationStatus");
     const notificationPreferenceKey = "familyEventsNotificationsEnabled";
     const reminderPreferenceKey = "familyEventsReminderDays";
-    const sentNotificationsKey = "familyEventsSentNotifications";
+    const pushApi = "https://family-push.go5.workers.dev";
 
-    // טעינת מספר הימים שנבחרו לתזכורת
+    // טוענים את מספר הימים שנבחר בעבר
     reminderDaysSelect.value = localStorage.getItem(reminderPreferenceKey) || "3";
 
-    // הצגת מצב ההתראות הנוכחי למשתמש
-    function updateNotificationStatus() {
-      const enabled = localStorage.getItem(notificationPreferenceKey) === "true";
+    // ממירים מפתח ציבורי בפורמט Base64URL למערך בתים שהדפדפן דורש
+    function urlBase64ToUint8Array(base64String) {
+      const padding = "=".repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+      const rawData = atob(base64);
+      return Uint8Array.from(rawData, character => character.charCodeAt(0));
+    }
+
+    // שולחים בקשת JSON לשירות ההתראות ומציגים שגיאה אם השרת דוחה אותה
+    async function pushApiRequest(path, payload) {
+      const response = await fetch(pushApi + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.error || result.message || "שגיאת שרת (" + response.status + ")");
+      }
+      return result;
+    }
+
+    // רושמים את קובץ שירות הרקע בתיקיית האתר
+    async function getPushRegistration() {
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        throw new Error("הדפדפן אינו תומך בהתראות Push.");
+      }
+      return navigator.serviceWorker.register("./sw.js", {
+        scope: "./",
+        updateViaCache: "none"
+      });
+    }
+
+    // קוראים את המפתח הציבורי מהשרת ותומכים בכמה שמות שדה אפשריים
+    async function getVapidPublicKey() {
+      const response = await fetch(pushApi + "/vapidPublicKey");
+      if (!response.ok) throw new Error("לא ניתן לקבל מפתח התראות מהשרת.");
+      const result = await response.json();
+      const key = typeof result === "string"
+        ? result
+        : result.publicKey || result.vapidPublicKey || result.key;
+      if (!key) throw new Error("השרת לא החזיר מפתח ציבורי תקין.");
+      return key;
+    }
+
+    // יוצרים או מעדכנים הרשמה לקבלת התראות בשרת
+    async function savePushSubscription(subscription) {
+      await pushApiRequest("/subscribe", {
+        subscription: subscription.toJSON(),
+        days: [Number(reminderDaysSelect.value)]
+      });
+    }
+
+    // מציגים למשתמש את מצב התמיכה וההרשמה בפועל
+    async function updateNotificationStatus() {
+      notificationButton.disabled = false;
       if (!("Notification" in window)) {
         notificationStatus.textContent = "הדפדפן הזה אינו תומך בהתראות.";
         notificationButton.disabled = true;
-      } else if (!window.isSecureContext) {
+        return;
+      }
+      if (!window.isSecureContext) {
         notificationStatus.textContent = "ההתראות דורשות חיבור מאובטח HTTPS.";
         notificationButton.disabled = true;
-      } else if (Notification.permission === "denied") {
-        notificationStatus.textContent = "ההתראות נחסמו בעבר. יש לאפשר אותן דרך הגדרות האתר בדפדפן.";
+        return;
+      }
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        notificationStatus.textContent = "הדפדפן אינו תומך בהתראות Push.";
+        notificationButton.disabled = true;
+        return;
+      }
+      if (Notification.permission === "denied") {
+        notificationStatus.textContent = "ההתראות נחסמו. יש לאפשר אותן בהגדרות האתר בדפדפן.";
         notificationButton.textContent = "בדיקת הרשאת התראות";
-      } else if (enabled && Notification.permission === "granted") {
-        notificationStatus.textContent = "ההתראות פעילות. התזכורת תישלח " + reminderDaysSelect.options[reminderDaysSelect.selectedIndex].text + ".";
-        notificationButton.textContent = "כיבוי התראות";
-      } else {
-        notificationStatus.textContent = "ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.";
-        notificationButton.textContent = "בדיקת והפעלת התראות";
+        return;
       }
+      const enabled = localStorage.getItem(notificationPreferenceKey) === "true";
+      if (enabled && Notification.permission === "granted") {
+        try {
+          const registration = await navigator.serviceWorker.getRegistration(new URL("./", location.href).href);
+          const subscription = registration && await registration.pushManager.getSubscription();
+          if (subscription) {
+            notificationStatus.textContent = "ההתראות פעילות גם כשהאתר סגור. התזכורת תישלח " + reminderDaysSelect.options[reminderDaysSelect.selectedIndex].text + ".";
+            notificationButton.textContent = "כיבוי התראות";
+            return;
+          }
+        } catch (error) {
+          // במקרה של כשל בבדיקת ההרשמה מציגים מצב שמאפשר ניסיון חוזר
+        }
+        notificationStatus.textContent = "נדרשת התחברות מחדש לשירות ההתראות.";
+        notificationButton.textContent = "חיבור מחדש להתראות";
+        return;
+      }
+      notificationStatus.textContent = "ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.";
+      notificationButton.textContent = "הפעלת התראות";
     }
 
-    // שליחת התראה חד-פעמית עבור אירוע במועד שנבחר
-    function checkUpcomingNotifications() {
-      if (!("Notification" in window) || Notification.permission !== "granted" || localStorage.getItem(notificationPreferenceKey) !== "true") return;
-      const daysBefore = Number(reminderDaysSelect.value);
-      const sent = JSON.parse(localStorage.getItem(sentNotificationsKey) || "[]");
-      const upcoming = getCalculatedEvents();
-      upcoming.filter(event => event.daysLeft === daysBefore).forEach(event => {
-        const eventKey = [event.family, event.name, event.type, event.date.getFullYear(), event.date.getMonth(), event.date.getDate()].join("|");
-        if (sent.includes(eventKey)) return;
-        const coupleLabel = event.type === "anniversary" ? getAnniversaryCoupleLabel(event.family) : null;
-        const eventLabel = event.type === "birthday" ? "יום הולדת של " + event.name + " " + getFamilySurname(event.family) : coupleLabel ? "יום נישואין של " + coupleLabel : "יום נישואין למשפחת " + getFamilySurname(event.family);
-        const notification = new Notification("תזכורת לאירוע משפחתי", {
-          body: eventLabel + (daysBefore === 0 ? " חל היום!" : " בעוד " + daysBefore + " ימים."),
-        });
-        notification.onclick = () => window.focus();
-        sent.push(eventKey);
-      });
-      localStorage.setItem(sentNotificationsKey, JSON.stringify(sent.slice(-300)));
-    }
-
-    // שמירת בחירת מועד התזכורת ועדכון המצב
-    reminderDaysSelect.addEventListener("change", () => {
+    // מעדכנים את מועד התזכורת בשרת כאשר המשתמש משנה את הבחירה
+    reminderDaysSelect.addEventListener("change", async () => {
       localStorage.setItem(reminderPreferenceKey, reminderDaysSelect.value);
-      updateNotificationStatus();
-      checkUpcomingNotifications();
-    });
-
-    // הפעלה או כיבוי של התראות לאחר לחיצה מפורשת של המשתמש
-    notificationButton.addEventListener("click", async () => {
-      // בודקים תמיכה בדפדפן ובחיבור מאובטח לפני בקשת ההרשאה
-      if (!("Notification" in window) || !window.isSecureContext) {
-        updateNotificationStatus();
-        return;
-      }
-      // לחיצה נוספת מכבה את ההתראות המקומיות
       if (localStorage.getItem(notificationPreferenceKey) === "true") {
-        localStorage.setItem(notificationPreferenceKey, "false");
-        updateNotificationStatus();
-        return;
+        try {
+          const registration = await getPushRegistration();
+          const subscription = await registration.pushManager.getSubscription();
+          if (subscription) await savePushSubscription(subscription);
+          notificationStatus.textContent = "בחירת מועד התזכורת עודכנה.";
+        } catch (error) {
+          notificationStatus.textContent = "לא הצלחנו לעדכן את מועד התזכורת: " + error.message;
+        }
       }
-      // מבקשים מהמשתמש אישור מפורש להצגת הודעות קופצות
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        localStorage.setItem(notificationPreferenceKey, "true");
-        localStorage.setItem(reminderPreferenceKey, reminderDaysSelect.value);
-        checkUpcomingNotifications();
-      } else if (permission === "denied") {
-        notificationStatus.textContent = "לא ניתנה הרשאה. אפשר לשנות זאת בהגדרות האתר בדפדפן.";
-      } else {
-        notificationStatus.textContent = "ההרשאה לא אושרה. ניתן לנסות שוב בלחיצה על הכפתור.";
-      }
-      updateNotificationStatus();
+      await updateNotificationStatus();
     });
 
-    // בדיקת התראות בפתיחת האתר, בחזרה ללשונית ובמרווחי זמן קבועים
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) checkUpcomingNotifications();
+    // מפעילים או מכבים הרשמה לקבלת התראות Push
+    notificationButton.addEventListener("click", async () => {
+      if (!("Notification" in window) || !window.isSecureContext) {
+        await updateNotificationStatus();
+        return;
+      }
+      notificationButton.disabled = true;
+      notificationStatus.textContent = "מתחברים לשירות ההתראות...";
+
+      try {
+        // אם קיימת הרשמה פעילה, מסירים אותה גם מהשרת וגם מהדפדפן
+        if (localStorage.getItem(notificationPreferenceKey) === "true") {
+          const registration = await getPushRegistration();
+          const subscription = await registration.pushManager.getSubscription();
+          if (subscription) {
+            await pushApiRequest("/unsubscribe", { endpoint: subscription.endpoint });
+            await subscription.unsubscribe();
+          }
+          localStorage.setItem(notificationPreferenceKey, "false");
+          notificationStatus.textContent = "ההתראות כובו.";
+        } else {
+          // מבקשים הרשאה רק בעקבות לחיצה מפורשת של המשתמש
+          const permission = await Notification.requestPermission();
+          if (permission !== "granted") {
+            notificationStatus.textContent = permission === "denied"
+              ? "לא ניתנה הרשאה. יש לאפשר התראות בהגדרות האתר בדפדפן."
+              : "ההרשאה לא אושרה. ניתן לנסות שוב.";
+            return;
+          }
+
+          // רושמים את שירות הרקע ומקבלים את המפתח הציבורי מהשרת
+          const registration = await getPushRegistration();
+          const publicKey = await getVapidPublicKey();
+          let subscription = await registration.pushManager.getSubscription();
+
+          // יוצרים הרשמת Push חדשה אם אין הרשמה קודמת
+          if (!subscription) {
+            subscription = await registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(publicKey)
+            });
+          }
+
+          // שומרים את ההרשמה ואת מספר הימים בשרת Cloudflare
+          await savePushSubscription(subscription);
+          localStorage.setItem(notificationPreferenceKey, "true");
+          localStorage.setItem(reminderPreferenceKey, reminderDaysSelect.value);
+          notificationStatus.textContent = "ההרשמה להתראות נשמרה בהצלחה.";
+        }
+      } catch (error) {
+        notificationStatus.textContent = "הפעולה נכשלה: " + error.message;
+      } finally {
+        notificationButton.disabled = false;
+        await updateNotificationStatus();
+      }
     });
-    window.setInterval(checkUpcomingNotifications, 60000);
+
+    // משחזרים את מצב ההרשמה הקיימת ומעדכנים אותה מול השרת
+    async function initializePushNotifications() {
+      if (localStorage.getItem(notificationPreferenceKey) !== "true" || Notification.permission !== "granted") {
+        await updateNotificationStatus();
+        return;
+      }
+      try {
+        const registration = await getPushRegistration();
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) await savePushSubscription(subscription);
+      } catch (error) {
+        notificationStatus.textContent = "לא הצלחנו לאמת את ההרשמה: " + error.message;
+      }
+      await updateNotificationStatus();
+    }
+
+    // מפעילים את בדיקת מצב ההתראות בעת טעינת הדף
+    initializePushNotifications();
 
     // אתחול מצב התצוגה לפי הבחירה השמורה במכשיר
     applyTheme(localStorage.getItem(themePreferenceKey) || "light");
