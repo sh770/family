@@ -234,7 +234,8 @@
     "day": 25,
     "month": "כסלו",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בעלה של",
+    "relatedName": "חיה מושקא"
   },
   {
     "name": "ליאור מרדכי",
@@ -274,7 +275,8 @@
     "day": 7,
     "month": "כסלו",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "כלתו של",
+    "relatedName": "יוסף יצחק הרפז"
   },
   {
     "name": "חיה מושקא",
