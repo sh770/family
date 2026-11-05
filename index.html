@@ -680,7 +680,7 @@
           const yearParts = new Intl.DateTimeFormat("en-u-ca-hebrew", { year: "numeric" }).formatToParts(date);
           const eventHebrewYear = Number(yearParts.find(part => part.type === "year").value.replace(/[^0-9]/g, ""));
           const anniversaryNumber = eventHebrewYear - event.marriageYear;
-          title.textContent = "יום נישואין למשפחת " + familyLabel + (anniversaryNumber > 0 ? " – " + numberToHebrewLetters(anniversaryNumber) + " שנים" : "");
+          title.textContent = "יום נישואין" + (anniversaryNumber > 0 ? " ה־" + anniversaryNumber : "") + " למשפחת " + familyLabel;
         } else {
           title.textContent = "יום נישואין למשפחת " + familyLabel;
         }
