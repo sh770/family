@@ -450,14 +450,14 @@
 
       // משפחת הרשקוביץ - הורים וילדים
       { name: "חיה מושקא", family: "הרשקוביץ", day: 3, month: "אדר", type: "birthday", relation: "בת" },
-      { name: "צביקה", family: "הרשקוביץ", day: 25, month: "כסלו", type: "birthday", relation: "בן" },
+      { name: "צביקה", family: "הרשקוביץ", day: 25, month: "כסלו", type: "birthday", relation: "בעלה של", relatedName: "חיה מושקא" },
       { name: "ליאור מרדכי", family: "הרשקוביץ", day: 20, month: "טבת", type: "birthday", relation: "בן" },
       { name: "לילי", family: "הרשקוביץ", day: 16, month: "תמוז", type: "birthday", relation: "בת" },
       { name: "דבורה", family: "הרשקוביץ", day: 11, month: "חשוון", type: "birthday", relation: "בת" },
 
       // משפחת הרפז - משפחה נוספת
       { name: "יוסף יצחק", family: "הרפז - משפחה נוספת", day: 19, month: "תמוז", type: "birthday", relation: "בן" },
-      { name: "רבקה רחל", family: "הרפז - משפחה נוספת", day: 7, month: "כסלו", type: "birthday", relation: "בת" },
+      { name: "רבקה רחל", family: "הרפז - משפחה נוספת", day: 7, month: "כסלו", type: "birthday", relation: "כלתו של", relatedName: "יוסף יצחק הרפז" },
       { name: "חיה מושקא", family: "הרפז - משפחה נוספת", day: 22, month: "אייר", type: "birthday", relation: "בת" },
       { name: "חנה", family: "הרפז - משפחה נוספת", day: 9, month: "חשוון", type: "birthday", relation: "בת" },
       { name: "שניאור זלמן", family: "הרפז - משפחה נוספת", day: 24, month: "כסלו", type: "birthday", relation: "בן" },
@@ -632,7 +632,7 @@
         year: "numeric"
       }).formatToParts(date);
       const dayNumber = Number(parts.find(part => part.type === "day").value.replace(/[^\d]/g, ""));
-      const monthName = parts.find(part => part.type === "month").value.replace(/^[בכ]/, "");
+      const monthName = parts.find(part => part.type === "month").value.replace(/^ב(?=[א-ת])/, "");
       const yearNumber = Number(parts.find(part => part.type === "year").value.replace(/[^\d]/g, ""));
       return numberToHebrewLetters(dayNumber) + " " + monthName + " " + formatHebrewYear(yearNumber);
     }
@@ -677,11 +677,15 @@
       if (event.type === "anniversary") {
         title.textContent = "יום נישואין למשפחת " + event.family.replace(" - משפחה נוספת", "").replace(" - רשומה נוספת", "");
       } else {
-        const parents = parent_map[event.family] || "הורי משפחת " + event.family;
-        const relationText = event.relation === "בת" ? "בתם של " : event.relation === "בנות" ? "בנותיהם של " : "בנם של ";
         const surname = getFamilySurname(event.family);
         const fullName = event.name.endsWith(surname) ? event.name : event.name + " " + surname;
-        title.textContent = "יום הולדת: " + fullName + " – " + relationText + parents;
+        if (event.relatedName && (event.relation === "בעלה של" || event.relation === "כלתו של")) {
+          title.textContent = "יום הולדת: " + fullName + " – " + event.relation + " " + event.relatedName;
+        } else {
+          const parents = parent_map[event.family] || "הורי משפחת " + event.family;
+          const relationText = event.relation === "בת" ? "בתם של " : event.relation === "בנות" ? "בנותיהם של " : "בנם של ";
+          title.textContent = "יום הולדת: " + fullName + " – " + relationText + parents;
+        }
       }
       content.appendChild(title);
 
