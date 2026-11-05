@@ -1344,7 +1344,7 @@
       const wife = familyBirthdays.find(event => event.relation === "אשתו של");
       const husbandName = husband?.name || wife?.relatedName;
       const wifeName = husband?.relatedName || wife?.name;
-      return husbandName && wifeName ? husbandName + " ו" + wifeName : null;
+      return husbandName && wifeName ? husbandName + " ו" + wifeName + " " + getFamilySurname(family) : null;
     }
 
     function createEventCard(event, date, daysLeft) {
