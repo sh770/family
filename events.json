@@ -6,7 +6,8 @@
     "month": "טבת",
     "type": "birthday",
     "relation": "בעלה של",
-    "relatedName": "פנינה ייטל פערל"
+    "relatedName": "פנינה ייטל פערל",
+    "birthYear": 5741
   },
   {
     "name": "פנינה ייטל פערל",
@@ -15,7 +16,8 @@
     "month": "כסלו",
     "type": "birthday",
     "relation": "אשתו של",
-    "relatedName": "משה ראובן שלום"
+    "relatedName": "משה ראובן שלום",
+    "birthYear": 5740
   },
   {
     "name": "רבקה",
@@ -23,7 +25,8 @@
     "day": 3,
     "month": "כסלו",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "בת",
+    "birthYear": 5769
   },
   {
     "name": "לוי יצחק",
@@ -31,7 +34,8 @@
     "day": 1,
     "month": "תמוז",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בן",
+    "birthYear": 5770
   },
   {
     "name": "חיה מושקא",
@@ -39,7 +43,8 @@
     "day": 22,
     "month": "אדר",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "בת",
+    "birthYear": 5772
   },
   {
     "name": "דבורה לאה",
@@ -47,7 +52,8 @@
     "day": 5,
     "month": "סיון",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "בת",
+    "birthYear": 5773
   },
   {
     "name": "דובער",
@@ -55,7 +61,8 @@
     "day": 20,
     "month": "סיון",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בן",
+    "birthYear": 5774
   },
   {
     "name": "מנוחה רחל",
@@ -63,7 +70,8 @@
     "day": 1,
     "month": "חשוון",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "בת",
+    "birthYear": 5776
   },
   {
     "name": "שניאור זלמן",
@@ -71,7 +79,8 @@
     "day": 14,
     "month": "כסלו",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בן",
+    "birthYear": 5777
   },
   {
     "name": "שמואל",
@@ -79,7 +88,8 @@
     "day": 4,
     "month": "תשרי",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בן",
+    "birthYear": 5787
   },
   {
     "name": "משפחת הרפז",
@@ -96,7 +106,8 @@
     "month": "שבט",
     "type": "birthday",
     "relation": "בעלה של",
-    "relatedName": "חנה"
+    "relatedName": "חנה",
+    "birthYear": 5741
   },
   {
     "name": "חנה",
@@ -105,7 +116,8 @@
     "month": "אב",
     "type": "birthday",
     "relation": "אשתו של",
-    "relatedName": "ינון שלום"
+    "relatedName": "ינון שלום",
+    "birthYear": 5742
   },
   {
     "name": "רחל מושקא",
@@ -113,7 +125,8 @@
     "day": 26,
     "month": "תשרי",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "בת",
+    "birthYear": 5763
   },
   {
     "name": "אביטל הודיה",
@@ -121,7 +134,8 @@
     "day": 9,
     "month": "שבט",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "בת",
+    "birthYear": 5764
   },
   {
     "name": "הלל אמונה",
@@ -129,7 +143,8 @@
     "day": 2,
     "month": "אדר",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "בת",
+    "birthYear": 5766
   },
   {
     "name": "מנחם מענדל אביעד",
@@ -137,7 +152,8 @@
     "day": 9,
     "month": "ניסן",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בן",
+    "birthYear": 5769
   },
   {
     "name": "שמואל",
@@ -145,7 +161,8 @@
     "day": 20,
     "month": "אדר ב",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בן",
+    "birthYear": 5771
   },
   {
     "name": "שניאור זלמן",
@@ -153,7 +170,8 @@
     "day": 15,
     "month": "ניסן",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בן",
+    "birthYear": 5773
   },
   {
     "name": "שירה יהודית",
@@ -161,7 +179,8 @@
     "day": 26,
     "month": "סיון",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "בת",
+    "birthYear": 5778
   },
   {
     "name": "משפחת גלעדי",
@@ -178,7 +197,8 @@
     "month": "שבט",
     "type": "birthday",
     "relation": "בעלה של",
-    "relatedName": "חוה הינדה"
+    "relatedName": "חוה הינדה",
+    "birthYear": 5739
   },
   {
     "name": "חוה הינדה",
@@ -187,7 +207,8 @@
     "month": "סיון",
     "type": "birthday",
     "relation": "אשתו של",
-    "relatedName": "שלמה אליעזר"
+    "relatedName": "שלמה אליעזר",
+    "birthYear": 5704
   },
   {
     "name": "העטי לאה",
@@ -542,7 +563,8 @@
     "month": "כסלו",
     "type": "birthday",
     "relation": "בעלה של",
-    "relatedName": "רחל מושקא"
+    "relatedName": "רחל מושקא",
+    "birthYear": 5759
   },
   {
     "name": "דבורה לאה",
@@ -635,7 +657,8 @@
     "month": "אב",
     "type": "birthday",
     "relation": "בעלה של",
-    "relatedName": "רזיאלה שרה"
+    "relatedName": "רזיאלה שרה",
+    "birthYear": 5721
   },
   {
     "name": "רזיאלה שרה",
@@ -644,7 +667,8 @@
     "month": "אדר",
     "type": "birthday",
     "relation": "אשתו של",
-    "relatedName": "נעם ישראל"
+    "relatedName": "נעם ישראל",
+    "birthYear": 5720
   },
   {
     "name": "משפחת הרפז",
