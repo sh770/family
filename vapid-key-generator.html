@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6fa">
+  <title>יצירת מפתחות VAPID להתראות</title>
+  <style>
+    /* הגדרות בסיסיות לעיצוב נוח במחשב ובנייד */
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 20px; background: #f4f6fa; color: #172033; font-family: Arial, sans-serif; line-height: 1.6; }
+    main { max-width: 760px; margin: 24px auto; padding: 24px; background: #fff; border-radius: 16px; box-shadow: 0 8px 28px #17203312; }
+    h1 { margin-top: 0; font-size: 1.55rem; }
+    h2 { font-size: 1.08rem; margin-bottom: 8px; }
+    .notice { margin: 18px 0; padding: 14px; border: 1px solid #edcf83; border-radius: 10px; background: #fff7df; }
+    .field { margin-top: 22px; }
+    textarea { width: 100%; min-height: 88px; padding: 12px; direction: ltr; text-align: left; border: 1px solid #ccd4e0; border-radius: 9px; resize: vertical; font: 13px/1.5 Consolas, monospace; }
+    #privateKey { min-height: 145px; }
+    button { border: 0; border-radius: 9px; padding: 12px 17px; background: #155eef; color: white; font-size: 1rem; font-weight: bold; cursor: pointer; }
+    button.secondary { background: #e8eef8; color: #183153; }
+    button:disabled { opacity: .6; cursor: wait; }
+    .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 8px; }
+    #status { min-height: 26px; margin-top: 15px; font-weight: bold; color: #176b3a; }
+    .small { color: #596579; font-size: .92rem; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>יצירת מפתחות VAPID להתראות</h1>
+  <p>הדף יוצר זוג מפתחות חדש עבור מערכת ההתראות של אתר המשפחה.</p>
+
+  <div class="notice">
+    <strong>אזהרה – המפתח הפרטי סודי:</strong>
+    אין לשלוח אותו לאף אחד, להעלות אותו ל־GitHub או להכניס אותו לקוד האתר.
+    יש לשמור אותו רק ב־Cloudflare כ־Secret בשם <code>VAPID_PRIVATE_JWK</code>.
+    יצירת זוג חדש מחייבת לעדכן יחד את המפתח הציבורי ואת המפתח הפרטי ב־Worker.
+  </div>
+
+  <button id="generate">יצירת זוג מפתחות חדש</button>
+  <p class="small">היצירה מתבצעת בדפדפן שלך באמצעות Web Crypto. המפתחות אינם נשלחים לשום שרת.</p>
+
+  <section class="field">
+    <h2>1. מפתח ציבורי – VAPID_PUBLIC_KEY</h2>
+    <textarea id="publicKey" readonly placeholder="המפתח הציבורי יופיע כאן"></textarea>
+    <div class="actions"><button class="secondary" data-copy="publicKey">העתקת המפתח הציבורי</button></div>
+  </section>
+
+  <section class="field">
+    <h2>2. מפתח פרטי – VAPID_PRIVATE_JWK</h2>
+    <textarea id="privateKey" readonly placeholder="המפתח הפרטי יופיע כאן"></textarea>
+    <div class="actions"><button class="secondary" data-copy="privateKey">העתקת ה־JWK המלא</button></div>
+  </section>
+
+  <section class="field">
+    <h2>3. שורת קוד להחלפה ב־Worker</h2>
+    <textarea id="workerLine" readonly placeholder="השורה להחלפה תופיע כאן"></textarea>
+    <div class="actions"><button class="secondary" data-copy="workerLine">העתקת השורה ל־Worker</button></div>
+  </section>
+
+  <div id="status" role="status" aria-live="polite"></div>
+
+  <hr>
+  <h2>השלבים לאחר יצירת המפתחות</h2>
+  <ol>
+    <li>מעתיקים את המפתח הפרטי ומגדירים ב־Cloudflare Worker Secret בשם <code>VAPID_PRIVATE_JWK</code>.</li>
+    <li>מחליפים בקוד ה־Worker את הערך של <code>VAPID_PUBLIC_KEY</code> במפתח הציבורי החדש.</li>
+    <li>שומרים ומפרסמים את ה־Worker.</li>
+    <li>לאחר מכן מחברים את האתר להרשמה להתראות ובודקים שליחה בפועל.</li>
+  </ol>
+  <p class="small">אין צורך להריץ פקודות או להתקין ספריות. מומלץ לשמור עותק מאובטח של המפתח הפרטי לפני שסוגרים את הדף.</p>
+</main>
+
+<script>
+  // שומר הפניה לכפתור יצירת המפתחות.
+  const generateButton = document.getElementById("generate");
+
+  // שומר הפניה לאזור שבו יוצגו הודעות הצלחה ושגיאה.
+  const statusBox = document.getElementById("status");
+
+  // ממיר בתים למחרוזת Base64URL בפורמט הנדרש על ידי VAPID.
+  function toBase64Url(bytes) {
+    // יוצר מחרוזת בינארית מתוך מערך הבתים.
+    let binary = "";
+    // מוסיף למחרוזת את התו המתאים לכל בית.
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    // מקודד ל־Base64 וממיר לפורמט Base64URL ללא תווי מילוי.
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  }
+
+  // יוצר זוג מפתחות ECDSA בעקומת P-256, שבה משתמש פרוטוקול VAPID.
+  async function createVapidKeys() {
+    // מבקש מהדפדפן ליצור זוג מפתחות שניתן לייצא.
+    const pair = await crypto.subtle.generateKey(
+      { name: "ECDSA", namedCurve: "P-256" },
+      true,
+      ["sign", "verify"]
+    );
+
+    // מייצא את המפתח הפרטי לפורמט JWK הכולל את הרכיב הסודי d.
+    const privateJwk = await crypto.subtle.exportKey("jwk", pair.privateKey);
+
+    // מייצא את המפתח הציבורי לבתים בפורמט הלא דחוס הנדרש ל־VAPID.
+    const publicBytes = new Uint8Array(await crypto.subtle.exportKey("raw", pair.publicKey));
+
+    // ממיר את המפתח הציבורי למחרוזת Base64URL.
+    const publicKey = toBase64Url(publicBytes);
+
+    // משאיר ב־JWK הפרטי רק את שדות המפתח הדרושים לייבוא ב־Worker.
+    const privateKey = JSON.stringify({
+      kty: privateJwk.kty,
+      crv: privateJwk.crv,
+      x: privateJwk.x,
+      y: privateJwk.y,
+      d: privateJwk.d
+    });
+
+    // מחזיר את המפתח הציבורי ואת המפתח הפרטי בפורמטים המתאימים.
+    return { publicKey, privateKey };
+  }
+
+  // יוצר זוג מפתחות חדש כאשר המשתמש לוחץ על הכפתור.
+  generateButton.addEventListener("click", async () => {
+    // משבית זמנית את הכפתור כדי למנוע יצירה כפולה.
+    generateButton.disabled = true;
+    // מציג הודעת המתנה בזמן יצירת המפתחות.
+    statusBox.textContent = "יוצר מפתחות...";
+    try {
+      // יוצר את זוג המפתחות מקומית בדפדפן.
+      const keys = await createVapidKeys();
+      // מציג את המפתח הציבורי בשדה הראשון.
+      document.getElementById("publicKey").value = keys.publicKey;
+      // מציג את המפתח הפרטי בפורמט JWK בשדה השני.
+      document.getElementById("privateKey").value = keys.privateKey;
+      // בונה שורת JavaScript מוכנה להחלפת הקבוע בקוד ה־Worker.
+      document.getElementById("workerLine").value =
+        'const VAPID_PUBLIC_KEY = "' + keys.publicKey + '";';
+      // מאשר שהמפתחות נוצרו ומזכיר לשמור אותם במקום מאובטח.
+      statusBox.textContent = "המפתחות נוצרו במכשיר. העתק ושמור את שניהם במקום בטוח.";
+    } catch (error) {
+      // מציג הודעת שגיאה אם הדפדפן לא הצליח ליצור את המפתחות.
+      statusBox.textContent = "יצירת המפתחות נכשלה: " + error.message;
+    } finally {
+      // מחזיר את הכפתור לפעולה גם אם התרחשה שגיאה.
+      generateButton.disabled = false;
+    }
+  });
+
+  // מחבר את כל כפתורי ההעתקה לשדות המתאימים.
+  document.querySelectorAll("[data-copy]").forEach(button => {
+    // מאזין ללחיצה על כפתור ההעתקה.
+    button.addEventListener("click", async () => {
+      // מאתר את שדה הטקסט לפי מזהה השדה שמופיע בכפתור.
+      const field = document.getElementById(button.dataset.copy);
+      // מונע ניסיון להעתיק שדה שעדיין ריק.
+      if (!field.value) {
+        statusBox.textContent = "יש ליצור תחילה זוג מפתחות.";
+        return;
+      }
+      try {
+        // מעתיק את הערך ללוח של המכשיר.
+        await navigator.clipboard.writeText(field.value);
+        // מודיע שההעתקה הצליחה.
+        statusBox.textContent = "הערך הועתק ללוח.";
+      } catch (error) {
+        // מסביר כיצד להעתיק ידנית אם הדפדפן חסם גישה ללוח.
+        statusBox.textContent = "ההעתקה האוטומטית נחסמה. סמן את הטקסט והעתק ידנית.";
+      }
+    });
+  });
+</script>
+</body>
+</html>
