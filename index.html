@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17324d">
+  <title>לוח אירועים משפחתי</title>
+  <style>
+    /* הגדרות צבעים ומידות כלליות */
+    :root {
+      color-scheme: light;
+      --bg: #f3f6fa;
+      --card: #ffffff;
+      --text: #172536;
+      --muted: #687789;
+      --primary: #17324d;
+      --line: #e2e8f0;
+      --birthday: #176b57;
+      --anniversary: #8056a5;
+    }
+
+    /* איפוס בסיסי והתאמת גודל רכיבים */
+    * { box-sizing: border-box; }
+
+    /* עיצוב גוף הדף */
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, "Noto Sans Hebrew", sans-serif;
+      line-height: 1.55;
+    }
+
+    /* אזור הכותרת העליונה */
+    header {
+      padding: 28px 16px 24px;
+      color: white;
+      background: linear-gradient(135deg, #17324d, #285879);
+    }
+
+    /* הגבלת רוחב התוכן */
+    .wrap {
+      width: min(920px, calc(100% - 28px));
+      margin: 0 auto;
+    }
+
+    /* כותרת ראשית */
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(25px, 5vw, 34px);
+    }
+
+    /* כותרת משנה */
+    .subtitle {
+      margin: 0;
+      color: #dce8f1;
+      font-size: 14px;
+    }
+
+    /* אזור הסינון והסיכום */
+    main { padding: 20px 0 40px; }
+
+    /* כרטיסי הסיכום */
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    /* עיצוב כרטיס סיכום בודד */
+    .summary-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+    }
+
+    /* המספר בכרטיס הסיכום */
+    .summary-number {
+      display: block;
+      color: var(--primary);
+      font-size: 25px;
+      font-weight: 700;
+    }
+
+    /* הכיתוב בכרטיס הסיכום */
+    .summary-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* אזור בקרי הסינון */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 14px;
+      margin-bottom: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+    }
+
+    /* תוויות של שדות */
+    label {
+      display: flex;
+      flex: 1 1 150px;
+      flex-direction: column;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* שדות בחירה */
+    select {
+      width: 100%;
+      min-height: 42px;
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      background: white;
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+    }
+
+    /* שורת הכותרת של רשימת האירועים */
+    .list-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 18px 2px 10px;
+    }
+
+    /* כותרת רשימת האירועים */
+    h2 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    /* מספר האירועים שמוצגים */
+    #resultCount {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* רשימת האירועים */
+    #events {
+      display: grid;
+      gap: 10px;
+    }
+
+    /* כרטיס אירוע */
+    .event {
+      display: grid;
+      grid-template-columns: 6px minmax(0, 1fr);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+      box-shadow: 0 2px 8px #1b355008;
+    }
+
+    /* פס צבע לפי סוג האירוע */
+    .event-bar.birthday { background: var(--birthday); }
+    .event-bar.anniversary { background: var(--anniversary); }
+
+    /* תוכן כרטיס האירוע */
+    .event-content { padding: 14px 15px; }
+
+    /* שורת סוג האירוע והספירה לאחור */
+    .event-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    /* תגית סוג אירוע */
+    .tag {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* צבע תגית יום הולדת */
+    .tag.birthday {
+      color: var(--birthday);
+      background: #e7f5f0;
+    }
+
+    /* צבע תגית יום נישואין */
+    .tag.anniversary {
+      color: var(--anniversary);
+      background: #f1eafa;
+    }
+
+    /* תצוגת מספר הימים שנותרו */
+    .countdown {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* שם בעל השמחה או המשפחה */
+    .event-title {
+      margin: 3px 0 8px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    /* פרטי התאריכים */
+    .dates {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px 18px;
+      color: #48596b;
+      font-size: 13px;
+    }
+
+    /* מצב שבו לא נמצאו אירועים */
+    .empty {
+      padding: 28px 16px;
+      border: 1px dashed #bdc9d6;
+      border-radius: 14px;
+      background: white;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* הערת הסבר בתחתית הדף */
+    .note {
+      margin: 18px 3px 0;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    /* התאמה למסכים צרים */
+    @media (max-width: 560px) {
+      .summary { gap: 7px; }
+      .summary-card { padding: 11px 9px; }
+      .summary-number { font-size: 22px; }
+      .summary-label { font-size: 11px; }
+      .filters { gap: 8px; }
+      label { flex-basis: 100%; }
+      .event-content { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>לוח אירועים משפחתי</h1>
+      <p class="subtitle">ימי הולדת וימי נישואין לפי התאריך העברי, עם התאריך הלועזי הקרוב</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="summary" aria-label="סיכום אירועים">
+      <div class="summary-card">
+        <span class="summary-number" id="totalCount">0</span>
+        <span class="summary-label">אירועים בתקופה שנבחרה</span>
+      </div>
+      <div class="summary-card">
+        <span class="summary-number" id="birthdayCount">0</span>
+        <span class="summary-label">ימי הולדת</span>
+      </div>
+      <div class="summary-card">
+        <span class="summary-number" id="anniversaryCount">0</span>
+        <span class="summary-label">ימי נישואין</span>
+      </div>
+    </section>
+
+    <section class="filters" aria-label="סינון אירועים">
+      <label>
+        טווח הצגה
+        <select id="range">
+          <option value="7">7 הימים הקרובים</option>
+          <option value="30" selected>30 הימים הקרובים</option>
+          <option value="90">90 הימים הקרובים</option>
+          <option value="365">השנה הקרובה</option>
+        </select>
+      </label>
+      <label>
+        סוג אירוע
+        <select id="kind">
+          <option value="all">כל האירועים</option>
+          <option value="birthday">ימי הולדת בלבד</option>
+          <option value="anniversary">ימי נישואין בלבד</option>
+        </select>
+      </label>
+      <label>
+        משפחה
+        <select id="family">
+          <option value="all">כל המשפחות</option>
+        </select>
+      </label>
+    </section>
+
+    <div class="list-heading">
+      <h2>האירועים הקרובים</h2>
+      <span id="resultCount"></span>
+    </div>
+    <section id="events" aria-live="polite"></section>
+    <p class="note">
+      החישוב מתבצע בדפדפן לפי הלוח העברי המובנה. אירועים ללא שנת לידה או נישואין מחושבים לפי היום והחודש בלבד.
+      התאריך הלועזי מציין את היום שבו חל התאריך העברי, החל מהיום.
+    </p>
+  </main>
+
+  <script>
+    // רשימת האירועים שנלקחו מהטקסט שסופק, כולל תאריכים עבריים ללא תלות בשנת הלידה
+    const eventsData = [
+      // משפחת הרפז - הורים, ילדים ויום נישואין
+      { name: "משה ראובן שלום", family: "הרפז", day: 27, month: "טבת", type: "birthday", relation: "בן" },
+      { name: "פנינה ייטל פערל", family: "הרפז", day: 2, month: "כסלו", type: "birthday", relation: "בת" },
+      { name: "רבקה", family: "הרפז", day: 3, month: "כסלו", type: "birthday", relation: "בת" },
+      { name: "לוי יצחק", family: "הרפז", day: 1, month: "תמוז", type: "birthday", relation: "בן" },
+      { name: "חיה מושקא", family: "הרפז", day: 22, month: "אדר", type: "birthday", relation: "בת" },
+      { name: "דבורה לאה", family: "הרפז", day: 5, month: "סיון", type: "birthday", relation: "בת" },
+      { name: "דובער", family: "הרפז", day: 20, month: "סיון", type: "birthday", relation: "בן" },
+      { name: "מנוחה רחל", family: "הרפז", day: 1, month: "חשוון", type: "birthday", relation: "בת" },
+      { name: "שניאור זלמן", family: "הרפז", day: 14, month: "כסלו", type: "birthday", relation: "בן" },
+      { name: "שמואל", family: "הרפז", day: 4, month: "תשרי", type: "birthday", relation: "בן" },
+      { name: "משפחת הרפז", family: "הרפז", day: 21, month: "אלול", type: "anniversary" },
+
+      // משפחת גלעדי - הורים, ילדים ויום נישואין
+      { name: "ינון שלום", family: "גלעדי", day: 21, month: "שבט", type: "birthday", relation: "בן" },
+      { name: "חנה", family: "גלעדי", day: 11, month: "אב", type: "birthday", relation: "בת" },
+      { name: "רחל מושקא", family: "גלעדי", day: 26, month: "תשרי", type: "birthday", relation: "בת" },
+      { name: "אביטל הודיה", family: "גלעדי", day: 9, month: "שבט", type: "birthday", relation: "בת" },
+      { name: "הלל אמונה", family: "גלעדי", day: 2, month: "אדר", type: "birthday", relation: "בת" },
+      { name: "מנחם מענדל אביעד", family: "גלעדי", day: 9, month: "ניסן", type: "birthday", relation: "בן" },
+      { name: "שמואל", family: "גלעדי", day: 20, month: "אדר ב", type: "birthday", relation: "בן" },
+      { name: "שניאור זלמן", family: "גלעדי", day: 15, month: "ניסן", type: "birthday", relation: "בן" },
+      { name: "שירה יהודית", family: "גלעדי", day: 26, month: "סיון", type: "birthday", relation: "בת" },
+      { name: "משפחת גלעדי", family: "גלעדי", day: 5, month: "סיון", type: "anniversary" },
+
+      // משפחת כץ - הורים, ילדים ויום נישואין
+      { name: "שלמה אליעזר", family: "כץ", day: 19, month: "שבט", type: "birthday", relation: "בן" },
+      { name: "חוה הינדה", family: "כץ", day: 22, month: "סיון", type: "birthday", relation: "בת" },
+      { name: "העטי לאה", family: "כץ", day: 12, month: "חשוון", type: "birthday", relation: "בת" },
+      { name: "לוי יצחק", family: "כץ", day: 26, month: "אדר ב", type: "birthday", relation: "בן" },
+      { name: "רבקה", family: "כץ", day: 10, month: "אב", type: "birthday", relation: "בת" },
+      { name: "חיה מוסיא וחנה", family: "כץ", day: 27, month: "כסלו", type: "birthday", relation: "בנות" },
+      { name: "משפחת כץ", family: "כץ", day: 12, month: "שבט", type: "anniversary" },
+
+      // משפחת הרשקוביץ - הורים וילדים
+      { name: "חיה מושקא", family: "הרשקוביץ", day: 3, month: "אדר", type: "birthday", relation: "בת" },
+      { name: "צביקה", family: "הרשקוביץ", day: 25, month: "כסלו", type: "birthday", relation: "בן" },
+      { name: "ליאור מרדכי", family: "הרשקוביץ", day: 20, month: "טבת", type: "birthday", relation: "בן" },
+      { name: "לילי", family: "הרשקוביץ", day: 16, month: "תמוז", type: "birthday", relation: "בת" },
+      { name: "דבורה", family: "הרשקוביץ", day: 11, month: "חשוון", type: "birthday", relation: "בת" },
+
+      // משפחת הרפז - משפחה נוספת
+      { name: "יוסף יצחק", family: "הרפז - משפחה נוספת", day: 19, month: "תמוז", type: "birthday", relation: "בן" },
+      { name: "רבקה רחל", family: "הרפז - משפחה נוספת", day: 7, month: "כסלו", type: "birthday", relation: "בת" },
+      { name: "חיה מושקא", family: "הרפז - משפחה נוספת", day: 22, month: "אייר", type: "birthday", relation: "בת" },
+      { name: "חנה", family: "הרפז - משפחה נוספת", day: 9, month: "חשוון", type: "birthday", relation: "בת" },
+      { name: "שניאור זלמן", family: "הרפז - משפחה נוספת", day: 24, month: "כסלו", type: "birthday", relation: "בן" },
+      { name: "דבורה לאה", family: "הרפז - משפחה נוספת", day: 18, month: "אלול", type: "birthday", relation: "בת" },
+      { name: "מנחם מענדל", family: "הרפז - משפחה נוספת", day: 4, month: "תשרי", type: "birthday", relation: "בן" },
+      { name: "שושנה ברכה", family: "הרפז - משפחה נוספת", day: 24, month: "תמוז", type: "birthday", relation: "בת" },
+      { name: "מנוחה", family: "הרפז - משפחה נוספת", day: 13, month: "אב", type: "birthday", relation: "בת" },
+      { name: "משפחת הרפז", family: "הרפז - משפחה נוספת", day: 20, month: "חשוון", type: "anniversary" },
+
+      // משפחת מריאין
+      { name: "מרדכי", family: "מריאין", day: 24, month: "תמוז", type: "birthday", relation: "בן" },
+      { name: "ברכה נחמה", family: "מריאין", day: 7, month: "טבת", type: "birthday", relation: "בת" },
+      { name: "מנחם מענדל", family: "מריאין", day: 20, month: "ניסן", type: "birthday", relation: "בן" },
+      { name: "חיה מושקא", family: "מריאין", day: 27, month: "אייר", type: "birthday", relation: "בת" },
+      { name: "אמונה רבקה", family: "מריאין", day: 11, month: "שבט", type: "birthday", relation: "בת" },
+      { name: "חנה", family: "מריאין", day: 6, month: "תשרי", type: "birthday", relation: "בת" },
+      { name: "שמואל נתן", family: "מריאין", day: 2, month: "אייר", type: "birthday", relation: "בן" },
+      { name: "משפחת מריאין", family: "מריאין", day: 1, month: "תמוז", type: "anniversary" },
+
+      // משפחת אברמוב
+      { name: "דוד", family: "אברמוב", day: 28, month: "כסלו", type: "birthday", relation: "בן" },
+      { name: "יהודית", family: "אברמוב", day: 1, month: "תשרי", type: "birthday", relation: "בת" },
+      { name: "חנה", family: "אברמוב", day: 26, month: "שבט", type: "birthday", relation: "בת" },
+      { name: "חיה מושקא", family: "אברמוב", day: 5, month: "אלול", type: "birthday", relation: "בת" },
+      { name: "יעקב אורי", family: "אברמוב", day: 20, month: "תשרי", type: "birthday", relation: "בן" },
+      { name: "שמואל", family: "אברמוב", day: 26, month: "חשוון", type: "birthday", relation: "בן" },
+      { name: "רפאל מנחם", family: "אברמוב", day: 7, month: "סיון", type: "birthday", relation: "בן" },
+      { name: "הלל תמר", family: "אברמוב", day: 19, month: "תשרי", type: "birthday", relation: "בת" },
+      { name: "משפחת אברמוב", family: "אברמוב", day: 2, month: "שבט", type: "anniversary" },
+
+      // משפחת וייסגלס
+      { name: "פייגא רות", family: "וייסגלס", day: 21, month: "סיון", type: "birthday", relation: "בת" },
+
+      // שמות נוספים שהופיעו בנפרד בטקסט
+      { name: "רבקה", family: "הרפז - רשומה נוספת", day: 12, month: "שבט", type: "birthday", relation: "בת" },
+      { name: "מנחם מענדל יהושע זעליג", family: "הרפז - רשומה נוספת", day: 3, month: "כסלו", type: "birthday", relation: "בן" },
+      { name: "חיים מרדכי", family: "הרפז - רשומה נוספת", day: 2, month: "חשוון", type: "birthday", relation: "בן" },
+
+      // משפחת שוורץ
+      { name: "רחל מושקא", family: "שוורץ", day: 26, month: "תשרי", type: "birthday", relation: "בת" },
+      { name: "לירון ליפא אברהם", family: "שוורץ", day: 28, month: "כסלו", type: "birthday", relation: "בן" },
+      { name: "דבורה לאה", family: "שוורץ", day: 1, month: "אדר", type: "birthday", relation: "בת" },
+      { name: "שיינא", family: "שוורץ", day: 9, month: "סיון", type: "birthday", relation: "בת" },
+      { name: "משפחת שוורץ", family: "שוורץ", day: 24, month: "שבט", type: "anniversary" },
+
+      // משפחת הענדל
+      { name: "העטי לאה", family: "הענדל", day: 12, month: "חשוון", type: "birthday", relation: "בת" },
+      { name: "שלום דוב בער הענדל", family: "הענדל", day: 4, month: "אב", type: "birthday", relation: "בן" },
+      { name: "מושקא", family: "הענדל", day: 29, month: "תמוז", type: "birthday", relation: "בת" },
+      { name: "משפחת הענדל", family: "הענדל", day: 16, month: "סיון", type: "anniversary" },
+
+      // משפחת פרוכטר
+      { name: "אביטל הודיה", family: "פרוכטר", day: 9, month: "שבט", type: "birthday", relation: "בת" },
+      { name: "זכריה דוד (זק)", family: "פרוכטר", day: 16, month: "חשוון", type: "birthday", relation: "בן" },
+      { name: "משפחת פרוכטר", family: "פרוכטר", day: 15, month: "סיון", type: "anniversary" }
+    ];
+
+    // הגדרת תצוגת תאריך עברי בפורמט מובנה של הדפדפן
+    const hebrewDateFormatter = new Intl.DateTimeFormat("he-IL-u-ca-hebrew", {
+      day: "numeric",
+      month: "long"
+    });
+
+    // הגדרת תצוגת תאריך לועזי בעברית
+    const gregorianDateFormatter = new Intl.DateTimeFormat("he-IL", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+
+    // הסרת סימני ניקוד וסימני גרש כדי לאפשר השוואה אחידה של שמות החודשים
+    function normalizeHebrew(value) {
+      return value.replace(/[\u0591-\u05C7]/g, "").replace(/[׳״']/g, "").replace(/\s+/g, " ").trim();
+    }
+
+    // המרת שם חודש עברי שמופק מהדפדפן לשם חודש אחיד
+    function normalizeMonth(value) {
+      const month = normalizeHebrew(value);
+      if (month.includes("אדר") && month.includes("ב")) return "אדר ב";
+      if (month.includes("אדר") && month.includes("א")) return "אדר א";
+      if (month.includes("אדר")) return "אדר";
+      if (month.includes("מרחשוון") || month.includes("מר חשוון")) return "חשוון";
+      return month;
+    }
+
+    // בדיקה אם החודש בתאריך העברי הנוכחי מתאים לחודש שנשמר באירוע
+    function monthMatches(actualMonth, wantedMonth) {
+      const actual = normalizeMonth(actualMonth);
+      const wanted = normalizeMonth(wantedMonth);
+      if (wanted === "אדר ב") return actual === "אדר ב" || actual === "אדר";
+      if (wanted === "אדר א") return actual === "אדר א";
+      if (wanted === "אדר") return actual === "אדר" || actual === "אדר ב";
+      return actual === wanted;
+    }
+
+    // החזרת היום והחודש העבריים עבור תאריך לועזי
+    function getHebrewParts(date) {
+      const parts = hebrewDateFormatter.formatToParts(date);
+      const dayText = parts.find(part => part.type === "day").value;
+      const monthText = parts.find(part => part.type === "month").value;
+      return { day: Number(dayText.replace(/[^\d]/g, "")), month: monthText };
+    }
+
+    // חיפוש התאריך הלועזי הקרוב שבו יחול התאריך העברי של האירוע
+    function findNextOccurrence(event, startDate) {
+      const candidate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+      for (let offset = 0; offset <= 800; offset++) {
+        const current = new Date(candidate);
+        current.setDate(candidate.getDate() + offset);
+        const hebrew = getHebrewParts(current);
+        if (hebrew.day === event.day && monthMatches(hebrew.month, event.month)) return current;
+      }
+      return null;
+    }
+
+    // חישוב מספר הימים בין היום לבין תאריך האירוע
+    function daysBetween(start, end) {
+      const first = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+      const second = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
+      return Math.round((second - first) / 86400000);
+    }
+
+    // המרת מספר לאותיות עבריות עם גרש או גרשיים לפי כללי המספרים העבריים
+    function numberToHebrewLetters(number) {
+      const values = [
+        [400, "ת"], [300, "ש"], [200, "ר"], [100, "ק"],
+        [90, "צ"], [80, "פ"], [70, "ע"], [60, "ס"],
+        [50, "נ"], [40, "מ"], [30, "ל"], [20, "כ"], [10, "י"],
+        [9, "ט"], [8, "ח"], [7, "ז"], [6, "ו"], [5, "ה"],
+        [4, "ד"], [3, "ג"], [2, "ב"], [1, "א"]
+      ];
+      let remaining = number;
+      let letters = "";
+      while (remaining >= 1000) {
+        letters += "ת";
+        remaining -= 400;
+      }
+      if (number >= 1000) {
+        const thousands = Math.floor(number / 1000);
+        const rest = number % 1000;
+        const thousandsText = numberToHebrewLetters(thousands).replace(/[׳״]/g, "");
+        const restText = numberToHebrewLetters(rest).replace(/[׳״]/g, "");
+        return thousandsText + "׳" + restText;
+      }
+      if (remaining === 15) return "טו";
+      if (remaining === 16) return "טז";
+      for (const [value, letter] of values) {
+        while (remaining >= value) {
+          letters += letter;
+          remaining -= value;
+        }
+      }
+      if (letters.length === 1) return letters + "׳";
+      return letters.slice(0, -1) + "״" + letters.slice(-1);
+    }
+
+    // יצירת תאריך עברי קריא באותיות, כולל השנה העברית
+    function formatHebrewDate(date) {
+      const parts = new Intl.DateTimeFormat("he-IL-u-ca-hebrew", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }).formatToParts(date);
+      const dayNumber = Number(parts.find(part => part.type === "day").value.replace(/[^\d]/g, ""));
+      const monthName = parts.find(part => part.type === "month").value.replace(/^[בכ]/, "");
+      const yearNumber = Number(parts.find(part => part.type === "year").value.replace(/[^\d]/g, ""));
+      return numberToHebrewLetters(dayNumber) + " " + monthName + " " + numberToHebrewLetters(yearNumber);
+    }
+
+    // שמות ההורים של כל משפחה, לצורך הצגת הקשר של הילד באירוע
+    const parent_map = {"הרפז": "משה ראובן שלום ופנינה ייטל פערל", "גלעדי": "ינון שלום וחנה", "כץ": "שלמה אליעזר וחוה הינדה", "הרשקוביץ": "חיה מושקא וצביקה", "הרפז - משפחה נוספת": "יוסף יצחק ורבקה רחל", "מריאין": "מרדכי וברכה נחמה", "אברמוב": "דוד ויהודית", "וייסגלס": "פייגא רות וברוך שלום", "הרפז - רשומה נוספת": "הורי המשפחה הרפז", "שוורץ": "רחל מושקא ולירון ליפא אברהם", "הענדל": "העטי לאה ושלום דוב בער הענדל", "פרוכטר": "אביטל הודיה וזכריה דוד"};
+
+    // בניית כרטיס אירוע באמצעות יצירת רכיבי HTML בטוחים
+    function createEventCard(event, date, daysLeft) {
+      const article = document.createElement("article");
+      article.className = "event";
+
+      const bar = document.createElement("div");
+      bar.className = "event-bar " + event.type;
+      article.appendChild(bar);
+
+      const content = document.createElement("div");
+      content.className = "event-content";
+      article.appendChild(content);
+
+      const top = document.createElement("div");
+      top.className = "event-top";
+      content.appendChild(top);
+
+      const tag = document.createElement("span");
+      tag.className = "tag " + event.type;
+      tag.textContent = event.type === "birthday" ? "יום הולדת" : "יום נישואין";
+      top.appendChild(tag);
+
+      const countdown = document.createElement("span");
+      countdown.className = "countdown";
+      countdown.textContent = daysLeft === 0 ? "היום!" : daysLeft === 1 ? "מחר" : "בעוד " + daysLeft + " ימים";
+      top.appendChild(countdown);
+
+      const title = document.createElement("div");
+      title.className = "event-title";
+      if (event.type === "anniversary") {
+        title.textContent = "יום נישואין למשפחת " + event.family.replace(" - משפחה נוספת", "").replace(" - רשומה נוספת", "");
+      } else {
+        const parents = parent_map[event.family] || "הורי משפחת " + event.family;
+        const relationText = event.relation === "בת" ? "בתם של " : event.relation === "בנות" ? "בנותיהם של " : "בנם של ";
+        title.textContent = "יום הולדת: " + event.name + " – " + relationText + parents;
+      }
+      content.appendChild(title);
+
+      const dates = document.createElement("div");
+      dates.className = "dates";
+      content.appendChild(dates);
+
+      const hebrew = document.createElement("span");
+      hebrew.textContent = "📅 עברי: " + formatHebrewDate(date);
+      dates.appendChild(hebrew);
+
+      const gregorian = document.createElement("span");
+      gregorian.textContent = "🗓️ לועזי: " + gregorianDateFormatter.format(date);
+      dates.appendChild(gregorian);
+
+      return article;
+    }
+
+    // איסוף כל האירועים והמרת התאריך העברי לתאריך הלועזי הקרוב
+    function getCalculatedEvents() {
+      const today = new Date();
+      const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      return eventsData.map(event => {
+        const date = findNextOccurrence(event, start);
+        return date ? { ...event, date, daysLeft: daysBetween(start, date) } : null;
+      }).filter(Boolean).sort((a, b) => a.date - b.date);
+    }
+
+    // מילוי רשימת המשפחות בתיבת הסינון
+    function populateFamilies() {
+      const familySelect = document.getElementById("family");
+      const families = [...new Set(eventsData.map(event => event.family))].sort((a, b) => a.localeCompare(b, "he"));
+      families.forEach(family => {
+        const option = document.createElement("option");
+        option.value = family;
+        option.textContent = family;
+        familySelect.appendChild(option);
+      });
+    }
+
+    // הצגת האירועים בהתאם לטווח ולמסננים שנבחרו
+    function renderEvents() {
+      const range = Number(document.getElementById("range").value);
+      const kind = document.getElementById("kind").value;
+      const family = document.getElementById("family").value;
+      const eventsElement = document.getElementById("events");
+      const calculated = getCalculatedEvents();
+
+      const filtered = calculated.filter(event =>
+        event.daysLeft <= range &&
+        (kind === "all" || event.type === kind) &&
+        (family === "all" || event.family === family)
+      );
+
+      eventsElement.replaceChildren();
+      filtered.forEach(event => eventsElement.appendChild(createEventCard(event, event.date, event.daysLeft)));
+
+      document.getElementById("totalCount").textContent = filtered.length;
+      document.getElementById("birthdayCount").textContent = filtered.filter(event => event.type === "birthday").length;
+      document.getElementById("anniversaryCount").textContent = filtered.filter(event => event.type === "anniversary").length;
+      document.getElementById("resultCount").textContent = filtered.length + " אירועים";
+
+      if (filtered.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "לא נמצאו אירועים בטווח ובסינון שבחרת.";
+        eventsElement.appendChild(empty);
+      }
+    }
+
+    // הפעלת הסינון מחדש כאשר המשתמש משנה אחת מהאפשרויות
+    document.getElementById("range").addEventListener("change", renderEvents);
+    document.getElementById("kind").addEventListener("change", renderEvents);
+    document.getElementById("family").addEventListener("change", renderEvents);
+
+    // אתחול רשימת המשפחות והצגת האירועים הראשונית
+    populateFamilies();
+    renderEvents();
+  </script>
+</body>
+</html>
