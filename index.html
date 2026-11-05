@@ -534,6 +534,7 @@
       if (month.includes("אדר") && month.includes("א")) return "אדר א";
       if (month.includes("אדר")) return "אדר";
       if (month.includes("מרחשוון") || month.includes("מר חשוון")) return "חשוון";
+      if (month === "סיוון") return "סיון";
       return month;
     }
 
