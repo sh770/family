@@ -725,33 +725,23 @@
       dates.className = "dates";
       content.appendChild(dates);
 
-      // הצגת התאריך המקורי לכל יום הולדת, גם כאשר שנת הלידה אינה ידועה
+      // הצגת תאריך הלידה המקורי פעם אחת בלבד, בעברית ובלועזית
       if (event.type === "birthday") {
-        const originalDayMonth = document.createElement("span");
-        originalDayMonth.textContent = "🎂 תאריך לידה מקורי: " + numberToHebrewLetters(event.day) + " " + event.month;
-        dates.appendChild(originalDayMonth);
-
         const today = new Date();
         const currentHebrewYear = getHebrewYear(today);
         const birthdayThisYear = findHebrewDateInYear(event, currentHebrewYear);
+        const birthDate = event.birthYear ? findHebrewDateInYear(event, event.birthYear) : null;
 
-        // הצגת השנה והתאריך הלועזי המקורי רק אם שנת הלידה נמסרה
-        if (event.birthYear) {
-          const birthDate = findHebrewDateInYear(event, event.birthYear);
-          const birthYearText = document.createElement("span");
-          birthYearText.textContent = "שנת לידה מקורית: " + formatHebrewYear(event.birthYear);
-          dates.appendChild(birthYearText);
+        // הצגת התאריך העברי המקורי המלא אם השנה ידועה, או יום וחודש בלבד אם אינה ידועה
+        const originalHebrew = document.createElement("span");
+        originalHebrew.textContent = "🎂 תאריך לידה עברי מקורי: " + (birthDate ? formatHebrewDate(birthDate) : numberToHebrewLetters(event.day) + " " + event.month);
+        dates.appendChild(originalHebrew);
 
-          // הצגת התאריך העברי המלא והמקבילה הלועזית כאשר נמצא תאריך מדויק
-          if (birthDate) {
-            const originalFullHebrew = document.createElement("span");
-            originalFullHebrew.textContent = "🎂 תאריך לידה עברי מלא: " + formatHebrewDate(birthDate);
-            dates.appendChild(originalFullHebrew);
-
-            const originalGregorian = document.createElement("span");
-            originalGregorian.textContent = "🗓️ תאריך לידה לועזי מקורי: " + gregorianDateFormatter.format(birthDate);
-            dates.appendChild(originalGregorian);
-          }
+        // הצגת התאריך הלועזי המקורי רק כאשר שנת הלידה ידועה ונמצא תאריך מדויק
+        if (birthDate) {
+          const originalGregorian = document.createElement("span");
+          originalGregorian.textContent = "🗓️ תאריך לידה לועזי מקורי: " + gregorianDateFormatter.format(birthDate);
+          dates.appendChild(originalGregorian);
 
           // חישוב הגיל לפי השאלה אם יום ההולדת העברי כבר חל השנה
           if (birthdayThisYear) {
