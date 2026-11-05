@@ -414,45 +414,41 @@
 
   <script>
     // רשימת האירועים שנלקחו מהטקסט שסופק, כולל תאריכים עבריים ללא תלות בשנת הלידה
+    // רשימת האירועים המשפחתיים, כולל שנות לידה רק כאשר נמסרו במפורש
     const eventsData = [
-      // אירועי משה ראובן שלום הרפז
-      {"name":"משה ראובן שלום","family":"משה ראובן שלום הרפז","day":27,"month":"טבת","type":"birthday","birthYear":5741,"relation":"בעלה של","relatedName":"פנינה ייטל פערל"},
-      {"name":"פנינה ייטל פערל","family":"משה ראובן שלום הרפז","day":2,"month":"כסלו","type":"birthday","birthYear":5740,"relation":"אשתו של","relatedName":"משה ראובן שלום"},
-      {"name":"רבקה","family":"משה ראובן שלום הרפז","day":3,"month":"כסלו","type":"birthday","birthYear":5769,"relation":"בת"},
-      {"name":"לוי יצחק","family":"משה ראובן שלום הרפז","day":1,"month":"תמוז","type":"birthday","birthYear":5770,"relation":"בן"},
-      {"name":"חיה מושקא","family":"משה ראובן שלום הרפז","day":22,"month":"אדר","type":"birthday","birthYear":5772,"relation":"בת"},
-      {"name":"דבורה לאה","family":"משה ראובן שלום הרפז","day":5,"month":"סיון","type":"birthday","birthYear":5773,"relation":"בת"},
-      {"name":"דובער","family":"משה ראובן שלום הרפז","day":20,"month":"סיון","type":"birthday","birthYear":5774,"relation":"בן"},
-      {"name":"מנוחה רחל","family":"משה ראובן שלום הרפז","day":1,"month":"חשוון","type":"birthday","birthYear":5776,"relation":"בת"},
-      {"name":"שניאור זלמן","family":"משה ראובן שלום הרפז","day":14,"month":"כסלו","type":"birthday","birthYear":5777,"relation":"בן"},
-      {"name":"שמואל","family":"משה ראובן שלום הרפז","day":4,"month":"תשרי","type":"birthday","birthYear":5787,"relation":"בן"},
+      {"name":"משה ראובן שלום","family":"משה ראובן שלום הרפז","day":27,"month":"טבת","type":"birthday","relation":"בעלה של","relatedName":"פנינה ייטל פערל"},
+      {"name":"פנינה ייטל פערל","family":"משה ראובן שלום הרפז","day":2,"month":"כסלו","type":"birthday","relation":"אשתו של","relatedName":"משה ראובן שלום"},
+      {"name":"רבקה","family":"משה ראובן שלום הרפז","day":3,"month":"כסלו","type":"birthday","relation":"בת"},
+      {"name":"לוי יצחק","family":"משה ראובן שלום הרפז","day":1,"month":"תמוז","type":"birthday","relation":"בן"},
+      {"name":"חיה מושקא","family":"משה ראובן שלום הרפז","day":22,"month":"אדר","type":"birthday","relation":"בת"},
+      {"name":"דבורה לאה","family":"משה ראובן שלום הרפז","day":5,"month":"סיון","type":"birthday","relation":"בת"},
+      {"name":"דובער","family":"משה ראובן שלום הרפז","day":20,"month":"סיון","type":"birthday","relation":"בן"},
+      {"name":"מנוחה רחל","family":"משה ראובן שלום הרפז","day":1,"month":"חשוון","type":"birthday","relation":"בת"},
+      {"name":"שניאור זלמן","family":"משה ראובן שלום הרפז","day":14,"month":"כסלו","type":"birthday","relation":"בן"},
+      {"name":"שמואל","family":"משה ראובן שלום הרפז","day":4,"month":"תשרי","type":"birthday","relation":"בן"},
       {"name":"משפחת הרפז","family":"משה ראובן שלום הרפז","day":21,"month":"אלול","type":"anniversary","marriageYear":5767},
-      // אירועי ינון שלום גלעדי
-      {"name":"ינון שלום","family":"ינון שלום גלעדי","day":21,"month":"שבט","type":"birthday","birthYear":5741,"relation":"בעלה של","relatedName":"חנה"},
-      {"name":"חנה","family":"ינון שלום גלעדי","day":11,"month":"אב","type":"birthday","birthYear":5742,"relation":"אשתו של","relatedName":"ינון שלום"},
-      {"name":"רחל מושקא","family":"ינון שלום גלעדי","day":26,"month":"תשרי","type":"birthday","birthYear":5763,"relation":"בת"},
-      {"name":"אביטל הודיה","family":"ינון שלום גלעדי","day":9,"month":"שבט","type":"birthday","birthYear":5764,"relation":"בת"},
-      {"name":"הלל אמונה","family":"ינון שלום גלעדי","day":2,"month":"אדר","type":"birthday","birthYear":5766,"relation":"בת"},
-      {"name":"מנחם מענדל אביעד","family":"ינון שלום גלעדי","day":9,"month":"ניסן","type":"birthday","birthYear":5769,"relation":"בן"},
-      {"name":"שמואל","family":"ינון שלום גלעדי","day":20,"month":"אדר ב","type":"birthday","birthYear":5771,"relation":"בן"},
-      {"name":"שניאור זלמן","family":"ינון שלום גלעדי","day":15,"month":"ניסן","type":"birthday","birthYear":5773,"relation":"בן"},
-      {"name":"שירה יהודית","family":"ינון שלום גלעדי","day":26,"month":"סיון","type":"birthday","birthYear":5778,"relation":"בת"},
+      {"name":"ינון שלום","family":"ינון שלום גלעדי","day":21,"month":"שבט","type":"birthday","relation":"בעלה של","relatedName":"חנה"},
+      {"name":"חנה","family":"ינון שלום גלעדי","day":11,"month":"אב","type":"birthday","relation":"אשתו של","relatedName":"ינון שלום"},
+      {"name":"רחל מושקא","family":"ינון שלום גלעדי","day":26,"month":"תשרי","type":"birthday","relation":"בת"},
+      {"name":"אביטל הודיה","family":"ינון שלום גלעדי","day":9,"month":"שבט","type":"birthday","relation":"בת"},
+      {"name":"הלל אמונה","family":"ינון שלום גלעדי","day":2,"month":"אדר","type":"birthday","relation":"בת"},
+      {"name":"מנחם מענדל אביעד","family":"ינון שלום גלעדי","day":9,"month":"ניסן","type":"birthday","relation":"בן"},
+      {"name":"שמואל","family":"ינון שלום גלעדי","day":20,"month":"אדר ב","type":"birthday","relation":"בן"},
+      {"name":"שניאור זלמן","family":"ינון שלום גלעדי","day":15,"month":"ניסן","type":"birthday","relation":"בן"},
+      {"name":"שירה יהודית","family":"ינון שלום גלעדי","day":26,"month":"סיון","type":"birthday","relation":"בת"},
       {"name":"משפחת גלעדי","family":"ינון שלום גלעדי","day":5,"month":"סיון","type":"anniversary","marriageYear":5760},
-      // אירועי שלמה אליעזר כץ
-      {"name":"שלמה אליעזר","family":"שלמה אליעזר כץ","day":19,"month":"שבט","type":"birthday","birthYear":5739,"relation":"בעלה של","relatedName":"חוה הינדה"},
-      {"name":"חוה הינדה","family":"שלמה אליעזר כץ","day":22,"month":"סיון","type":"birthday","birthYear":5704,"relation":"אשתו של","relatedName":"שלמה אליעזר"},
+      {"name":"שלמה אליעזר","family":"שלמה אליעזר כץ","day":19,"month":"שבט","type":"birthday","relation":"בעלה של","relatedName":"חוה הינדה"},
+      {"name":"חוה הינדה","family":"שלמה אליעזר כץ","day":22,"month":"סיון","type":"birthday","relation":"אשתו של","relatedName":"שלמה אליעזר"},
       {"name":"העטי לאה","family":"שלמה אליעזר כץ","day":12,"month":"חשוון","type":"birthday","relation":"בת"},
       {"name":"לוי יצחק","family":"שלמה אליעזר כץ","day":26,"month":"אדר ב","type":"birthday","relation":"בן"},
       {"name":"רבקה","family":"שלמה אליעזר כץ","day":10,"month":"אב","type":"birthday","relation":"בת"},
       {"name":"חיה מוסיא וחנה","family":"שלמה אליעזר כץ","day":27,"month":"כסלו","type":"birthday","relation":"בנות"},
       {"name":"משפחת כץ","family":"שלמה אליעזר כץ","day":12,"month":"שבט","type":"anniversary","marriageYear":5763},
-      // אירועי צביקה הרשקוביץ
       {"name":"חיה מושקא","family":"צביקה הרשקוביץ","day":3,"month":"אדר","type":"birthday","relation":"אשתו של","relatedName":"צביקה"},
       {"name":"צביקה","family":"צביקה הרשקוביץ","day":25,"month":"כסלו","type":"birthday","relation":"בעלה של","relatedName":"חיה מושקא"},
       {"name":"ליאור מרדכי","family":"צביקה הרשקוביץ","day":20,"month":"טבת","type":"birthday","relation":"בן"},
       {"name":"לילי","family":"צביקה הרשקוביץ","day":16,"month":"תמוז","type":"birthday","relation":"בת"},
       {"name":"דבורה","family":"צביקה הרשקוביץ","day":11,"month":"חשוון","type":"birthday","relation":"בת"},
-      // אירועי יוסף יצחק הרפז
       {"name":"יוסף יצחק","family":"יוסף יצחק הרפז","day":19,"month":"תמוז","type":"birthday","relation":"בעלה של","relatedName":"רבקה רחל"},
       {"name":"רבקה רחל","family":"יוסף יצחק הרפז","day":7,"month":"כסלו","type":"birthday","relation":"אשתו של","relatedName":"יוסף יצחק"},
       {"name":"חיה מושקא","family":"יוסף יצחק הרפז","day":22,"month":"אייר","type":"birthday","relation":"בת"},
@@ -463,7 +459,6 @@
       {"name":"שושנה ברכה","family":"יוסף יצחק הרפז","day":24,"month":"תמוז","type":"birthday","relation":"בת"},
       {"name":"מנוחה","family":"יוסף יצחק הרפז","day":13,"month":"אב","type":"birthday","relation":"בת"},
       {"name":"משפחת הרפז","family":"יוסף יצחק הרפז","day":20,"month":"חשוון","type":"anniversary","marriageYear":5775},
-      // אירועי מרדכי מריאין
       {"name":"מרדכי","family":"מרדכי מריאין","day":24,"month":"תמוז","type":"birthday","relation":"בעלה של","relatedName":"ברכה נחמה"},
       {"name":"ברכה נחמה","family":"מרדכי מריאין","day":7,"month":"טבת","type":"birthday","relation":"אשתו של","relatedName":"מרדכי"},
       {"name":"מנחם מענדל","family":"מרדכי מריאין","day":20,"month":"ניסן","type":"birthday","relation":"בן"},
@@ -472,7 +467,6 @@
       {"name":"חנה","family":"מרדכי מריאין","day":6,"month":"תשרי","type":"birthday","relation":"בת"},
       {"name":"שמואל נתן","family":"מרדכי מריאין","day":2,"month":"אייר","type":"birthday","relation":"בן"},
       {"name":"משפחת מריאין","family":"מרדכי מריאין","day":1,"month":"תמוז","type":"anniversary","marriageYear":5774},
-      // אירועי דוד אברמוב
       {"name":"דוד","family":"דוד אברמוב","day":28,"month":"כסלו","type":"birthday","relation":"בעלה של","relatedName":"יהודית"},
       {"name":"יהודית","family":"דוד אברמוב","day":1,"month":"תשרי","type":"birthday","relation":"אשתו של","relatedName":"דוד"},
       {"name":"חנה","family":"דוד אברמוב","day":26,"month":"שבט","type":"birthday","relation":"בת"},
@@ -482,30 +476,24 @@
       {"name":"רפאל מנחם","family":"דוד אברמוב","day":7,"month":"סיון","type":"birthday","relation":"בן"},
       {"name":"הלל תמר","family":"דוד אברמוב","day":19,"month":"תשרי","type":"birthday","relation":"בת"},
       {"name":"משפחת אברמוב","family":"דוד אברמוב","day":2,"month":"שבט","type":"anniversary","marriageYear":5775},
-      // אירועי ברוך שלום וייסגלס
       {"name":"פייגא רות","family":"ברוך שלום וייסגלס","day":21,"month":"סיון","type":"birthday","relation":"אשתו של","relatedName":"ברוך שלום"},
-      // אירועי הורי המשפחה הרפז
       {"name":"רבקה","family":"הורי המשפחה הרפז","day":12,"month":"שבט","type":"birthday","relation":"בת"},
       {"name":"מנחם מענדל יהושע זעליג","family":"הורי המשפחה הרפז","day":3,"month":"כסלו","type":"birthday","relation":"בן"},
       {"name":"חיים מרדכי","family":"הורי המשפחה הרפז","day":2,"month":"חשוון","type":"birthday","relation":"בן"},
-      // אירועי לירון ליפא אברהם שוורץ
-      {"name":"רחל מושקא","family":"לירון ליפא אברהם שוורץ","day":26,"month":"תשרי","type":"birthday","relation":"אשתו של","relatedName":"לירון ליפא אברהם"},
-      {"name":"לירון ליפא אברהם","family":"לירון ליפא אברהם שוורץ","day":28,"month":"כסלו","type":"birthday","birthYear":5759,"relation":"בעלה של","relatedName":"רחל מושקא"},
-      {"name":"דבורה לאה","family":"לירון ליפא אברהם שוורץ","day":1,"month":"אדר","type":"birthday","relation":"בת"},
-      {"name":"שיינא","family":"לירון ליפא אברהם שוורץ","day":9,"month":"סיון","type":"birthday","relation":"בת"},
-      {"name":"משפחת שוורץ","family":"לירון ליפא אברהם שוורץ","day":24,"month":"שבט","type":"anniversary","marriageYear":5781},
-      // אירועי שלום דוב בער הענדל
+      {"name":"רחל מושקא","family":"לירון ליפא אברהם שוורץ","day":26,"month":"תשרי","type":"birthday","relation":"אשתו של","relatedName":"לירון ליפא אברהם","birthYear":5763},
+      {"name":"לירון ליפא אברהם","family":"לירון ליפא אברהם שוורץ","day":28,"month":"כסלו","type":"birthday","relation":"בעלה של","relatedName":"רחל מושקא","birthYear":5759},
+      {"name":"דבורה לאה","family":"לירון ליפא אברהם שוורץ","day":1,"month":"אדר","type":"birthday","relation":"בת","birthYear":5783},
+      {"name":"שיינא","family":"לירון ליפא אברהם שוורץ","day":9,"month":"סיון","type":"birthday","relation":"בת","birthYear":5785},
+      {"name":"משפחת שוורץ","family":"לירון ליפא אברהם שוורץ","day":25,"month":"שבט","type":"anniversary","marriageYear":5782},
       {"name":"העטי לאה","family":"שלום דוב בער הענדל","day":12,"month":"חשוון","type":"birthday","relation":"אשתו של","relatedName":"שלום דוב בער הענדל"},
       {"name":"שלום דוב בער הענדל","family":"שלום דוב בער הענדל","day":4,"month":"אב","type":"birthday","relation":"בעלה של","relatedName":"העטי לאה"},
       {"name":"מושקא","family":"שלום דוב בער הענדל","day":29,"month":"תמוז","type":"birthday","relation":"בת"},
       {"name":"משפחת הענדל","family":"שלום דוב בער הענדל","day":16,"month":"סיון","type":"anniversary","marriageYear":5783},
-      // אירועי זכריה דוד פרוכטר
       {"name":"אביטל הודיה","family":"זכריה דוד פרוכטר","day":9,"month":"שבט","type":"birthday","relation":"אשתו של","relatedName":"זכריה דוד (זק)"},
       {"name":"זכריה דוד (זק)","family":"זכריה דוד פרוכטר","day":16,"month":"חשוון","type":"birthday","relation":"בעלה של","relatedName":"אביטל הודיה"},
       {"name":"משפחת פרוכטר","family":"זכריה דוד פרוכטר","day":15,"month":"סיון","type":"anniversary","marriageYear":5784},
-      // אירועי נעם ישראל הרפז
-      {"name":"נעם ישראל","family":"נעם ישראל הרפז","day":26,"month":"אב","type":"birthday","birthYear":5721,"relation":"בעלה של","relatedName":"רזיאלה שרה"},
-      {"name":"רזיאלה שרה","family":"נעם ישראל הרפז","day":15,"month":"אדר","type":"birthday","birthYear":5720,"relation":"אשתו של","relatedName":"נעם ישראל"},
+      {"name":"נעם ישראל","family":"נעם ישראל הרפז","day":26,"month":"אב","type":"birthday","relation":"בעלה של","relatedName":"רזיאלה שרה"},
+      {"name":"רזיאלה שרה","family":"נעם ישראל הרפז","day":15,"month":"אדר","type":"birthday","relation":"אשתו של","relatedName":"נעם ישראל"},
       {"name":"משפחת הרפז","family":"נעם ישראל הרפז","day":18,"month":"אלול","type":"anniversary","marriageYear":5739}
     ];
 
@@ -637,6 +625,24 @@
       return null;
     }
 
+    // חילוץ השנה העברית מתוך תאריך לועזי
+    function getHebrewYear(date) {
+      const parts = new Intl.DateTimeFormat("en-u-ca-hebrew", { year: "numeric" }).formatToParts(date);
+      return Number(parts.find(part => part.type === "year").value.replace(/[^0-9]/g, ""));
+    }
+
+    // איתור התאריך הלועזי של יום הולדת עברי בתוך שנה עברית מסוימת
+    function findHebrewDateInYear(event, hebrewYear) {
+      const start = new Date(hebrewYear - 3761, 0, 1);
+      for (let offset = 0; offset < 800; offset++) {
+        const candidate = new Date(start);
+        candidate.setDate(start.getDate() + offset);
+        const parts = getHebrewParts(candidate);
+        if (getHebrewYear(candidate) === hebrewYear && parts.day === event.day && monthMatches(parts.month, event.month)) return candidate;
+      }
+      return null;
+    }
+
     // יצירת תאריך עברי קריא באותיות, כולל השנה העברית
     function formatHebrewDate(date) {
       const parts = new Intl.DateTimeFormat("he-IL-u-ca-hebrew", {
@@ -714,6 +720,24 @@
       const dates = document.createElement("div");
       dates.className = "dates";
       content.appendChild(dates);
+
+      // הצגת שנת הלידה המקורית והגיל רק כאשר שנת הלידה ידועה
+      if (event.type === "birthday" && event.birthYear) {
+        const birthDate = findHebrewDateInYear(event, event.birthYear);
+        if (birthDate) {
+          const birthYearText = document.createElement("span");
+          birthYearText.textContent = "🎂 שנת לידה מקורית: " + formatHebrewYear(event.birthYear) + " (" + birthDate.getFullYear() + ")";
+          dates.appendChild(birthYearText);
+
+          const today = new Date();
+          const currentHebrewYear = getHebrewYear(today);
+          const birthdayThisYear = findHebrewDateInYear(event, currentHebrewYear);
+          const age = currentHebrewYear - event.birthYear - (birthdayThisYear && today < birthdayThisYear ? 1 : 0);
+          const ageText = document.createElement("span");
+          ageText.textContent = "🎈 גיל: " + age;
+          dates.appendChild(ageText);
+        }
+      }
 
       // הצגת שנת הלידה המקורית והגיל רק כאשר שנת הלידה ידועה
       if (event.type === "birthday" && event.birthYear) {
