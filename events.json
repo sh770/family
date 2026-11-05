@@ -627,5 +627,31 @@
     "month": "סיון",
     "type": "anniversary",
     "marriageYear": 5784
+  },
+  {
+    "name": "נעם ישראל",
+    "family": "נעם ישראל הרפז",
+    "day": 26,
+    "month": "אב",
+    "type": "birthday",
+    "relation": "בעלה של",
+    "relatedName": "רזיאלה שרה"
+  },
+  {
+    "name": "רזיאלה שרה",
+    "family": "נעם ישראל הרפז",
+    "day": 15,
+    "month": "אדר",
+    "type": "birthday",
+    "relation": "אשתו של",
+    "relatedName": "נעם ישראל"
+  },
+  {
+    "name": "משפחת הרפז",
+    "family": "נעם ישראל הרפז",
+    "day": 18,
+    "month": "אלול",
+    "type": "anniversary",
+    "marriageYear": 5739
   }
 ]
