@@ -10,8 +10,6 @@ self.addEventListener("push", event => {
   event.waitUntil(
     self.registration.showNotification(data.title || "תזכורת משפחתית", {
       body: data.body || "יש אירוע משפחתי קרוב",
-      icon: "./icon.png",
-      badge: "./icon.png",
       data: { url: data.url || "https://sh770.github.io/family/" },
       tag: data.tag || "family-event"
     })
