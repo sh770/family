@@ -13,7 +13,8 @@
     "day": 2,
     "month": "כסלו",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "אשתו של",
+    "relatedName": "משה ראובן שלום"
   },
   {
     "name": "רבקה",
