@@ -1750,7 +1750,7 @@
 
     // משחזרים את מצב ההרשמה הקיימת ומעדכנים אותה מול השרת
     async function initializePushNotifications() {
-      if (localStorage.getItem(notificationPreferenceKey) !== "true" || Notification.permission !== "granted") {
+      if (!( "Notification" in window) || localStorage.getItem(notificationPreferenceKey) !== "true" || Notification.permission !== "granted") {
         await updateNotificationStatus();
         return;
       }
