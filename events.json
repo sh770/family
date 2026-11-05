@@ -5,7 +5,8 @@
     "day": 27,
     "month": "טבת",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בעלה של",
+    "relatedName": "פנינה ייטל פערל"
   },
   {
     "name": "פנינה ייטל פערל",
@@ -93,7 +94,8 @@
     "day": 21,
     "month": "שבט",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בעלה של",
+    "relatedName": "חנה"
   },
   {
     "name": "חנה",
@@ -101,7 +103,8 @@
     "day": 11,
     "month": "אב",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "אשתו של",
+    "relatedName": "ינון שלום"
   },
   {
     "name": "רחל מושקא",
@@ -172,7 +175,8 @@
     "day": 19,
     "month": "שבט",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בעלה של",
+    "relatedName": "חוה הינדה"
   },
   {
     "name": "חוה הינדה",
@@ -180,7 +184,8 @@
     "day": 22,
     "month": "סיון",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "אשתו של",
+    "relatedName": "שלמה אליעזר"
   },
   {
     "name": "העטי לאה",
@@ -227,7 +232,8 @@
     "day": 3,
     "month": "אדר",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "אשתו של",
+    "relatedName": "צביקה"
   },
   {
     "name": "צביקה",
@@ -268,7 +274,8 @@
     "day": 19,
     "month": "תמוז",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בעלה של",
+    "relatedName": "רבקה רחל"
   },
   {
     "name": "רבקה רחל",
@@ -276,8 +283,8 @@
     "day": 7,
     "month": "כסלו",
     "type": "birthday",
-    "relation": "כלתו של",
-    "relatedName": "יוסף יצחק הרפז"
+    "relation": "אשתו של",
+    "relatedName": "יוסף יצחק"
   },
   {
     "name": "חיה מושקא",
@@ -348,7 +355,8 @@
     "day": 24,
     "month": "תמוז",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בעלה של",
+    "relatedName": "ברכה נחמה"
   },
   {
     "name": "ברכה נחמה",
@@ -356,7 +364,8 @@
     "day": 7,
     "month": "טבת",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "אשתו של",
+    "relatedName": "מרדכי"
   },
   {
     "name": "מנחם מענדל",
@@ -411,7 +420,8 @@
     "day": 28,
     "month": "כסלו",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בעלה של",
+    "relatedName": "יהודית"
   },
   {
     "name": "יהודית",
@@ -419,7 +429,8 @@
     "day": 1,
     "month": "תשרי",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "אשתו של",
+    "relatedName": "דוד"
   },
   {
     "name": "חנה",
@@ -482,7 +493,8 @@
     "day": 21,
     "month": "סיון",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "אשתו של",
+    "relatedName": "ברוך שלום"
   },
   {
     "name": "רבקה",
@@ -514,7 +526,8 @@
     "day": 26,
     "month": "תשרי",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "אשתו של",
+    "relatedName": "לירון ליפא אברהם"
   },
   {
     "name": "לירון ליפא אברהם",
@@ -522,7 +535,8 @@
     "day": 28,
     "month": "כסלו",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בעלה של",
+    "relatedName": "רחל מושקא"
   },
   {
     "name": "דבורה לאה",
@@ -553,7 +567,8 @@
     "day": 12,
     "month": "חשוון",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "אשתו של",
+    "relatedName": "שלום דוב בער הענדל"
   },
   {
     "name": "שלום דוב בער הענדל",
@@ -561,7 +576,8 @@
     "day": 4,
     "month": "אב",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בעלה של",
+    "relatedName": "העטי לאה"
   },
   {
     "name": "מושקא",
@@ -584,7 +600,8 @@
     "day": 9,
     "month": "שבט",
     "type": "birthday",
-    "relation": "בת"
+    "relation": "אשתו של",
+    "relatedName": "זכריה דוד (זק)"
   },
   {
     "name": "זכריה דוד (זק)",
@@ -592,7 +609,8 @@
     "day": 16,
     "month": "חשוון",
     "type": "birthday",
-    "relation": "בן"
+    "relation": "בעלה של",
+    "relatedName": "אביטל הודיה"
   },
   {
     "name": "משפחת פרוכטר",
