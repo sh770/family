@@ -781,13 +781,16 @@
         dates.appendChild(original);
       }
 
-      const hebrew = document.createElement("span");
-      hebrew.textContent = "📅 " + (event.type === "birthday" ? "יום הולדת: " : "יום נישואין: ") + formatHebrewDate(date);
-      dates.appendChild(hebrew);
+      // הצגת תאריך האירוע הכללי רק לימי נישואין; יום הולדת כבר מוצג בפירוט למעלה
+      if (event.type !== "birthday") {
+        const hebrew = document.createElement("span");
+        hebrew.textContent = "📅 יום נישואין: " + formatHebrewDate(date);
+        dates.appendChild(hebrew);
 
-      const gregorian = document.createElement("span");
-      gregorian.textContent = "🗓️ לועזי: " + gregorianDateFormatter.format(date);
-      dates.appendChild(gregorian);
+        const gregorian = document.createElement("span");
+        gregorian.textContent = "🗓️ לועזי: " + gregorianDateFormatter.format(date);
+        dates.appendChild(gregorian);
+      }
 
       return article;
     }
