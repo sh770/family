@@ -1131,10 +1131,18 @@
   }
 ];
 
-    // הגדרת תצוגת תאריך עברי בפורמט מובנה של הדפדפן
+    // יצירת מעצבי תאריכים פעם אחת בלבד כדי למנוע יצירה חוזרת שלהם
     const hebrewDateFormatter = new Intl.DateTimeFormat("he-IL-u-ca-hebrew", {
       day: "numeric",
       month: "long"
+    });
+    const hebrewFullDateFormatter = new Intl.DateTimeFormat("he-IL-u-ca-hebrew", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+    const hebrewYearFormatter = new Intl.DateTimeFormat("en-u-ca-hebrew", {
+      year: "numeric"
     });
 
     // הגדרת תצוגת תאריך לועזי בעברית
@@ -1144,6 +1152,13 @@
       month: "long",
       year: "numeric"
     });
+
+    // מטמונים לשימוש חוזר בתוצאות חישובי התאריכים
+    const hebrewPartsCache = new Map();
+    const hebrewYearCache = new Map();
+    const hebrewDateInYearCache = new Map();
+    const nextOccurrenceCache = new Map();
+    let calculatedEventsCache = { dateKey: "", events: null };
 
     // הסרת סימני ניקוד וסימני גרש כדי לאפשר השוואה אחידה של שמות החודשים
     function normalizeHebrew(value) {
@@ -1175,23 +1190,45 @@
       return actual === wanted;
     }
 
-    // החזרת היום והחודש העבריים עבור תאריך לועזי
+    // יצירת מפתח אחיד לתאריך מקומי לצורך שמירת תוצאות במטמון
+    function getDateCacheKey(date) {
+      return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    }
+
+    // החזרת היום והחודש העבריים תוך שמירת התוצאה כדי לחשב כל תאריך פעם אחת
     function getHebrewParts(date) {
+      const key = getDateCacheKey(date);
+      if (hebrewPartsCache.has(key)) return hebrewPartsCache.get(key);
+
       const parts = hebrewDateFormatter.formatToParts(date);
       const dayText = parts.find(part => part.type === "day").value;
       const monthText = parts.find(part => part.type === "month").value;
-      return { day: Number(dayText.replace(/[^\d]/g, "")), month: monthText };
+      const result = { day: Number(dayText.replace(/[^\d]/g, "")), month: monthText };
+      hebrewPartsCache.set(key, result);
+      return result;
     }
 
-    // חיפוש התאריך הלועזי הקרוב שבו יחול התאריך העברי של האירוע
+    // חיפוש התאריך הלועזי הקרוב תוך שמירת התוצאה לשימוש חוזר
     function findNextOccurrence(event, startDate) {
+      const startKey = getDateCacheKey(startDate);
+      const cacheKey = startKey + "|" + event.day + "|" + normalizeMonth(event.month);
+      if (nextOccurrenceCache.has(cacheKey)) {
+        const cachedDate = nextOccurrenceCache.get(cacheKey);
+        return cachedDate ? new Date(cachedDate) : null;
+      }
+
       const candidate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
       for (let offset = 0; offset <= 800; offset++) {
         const current = new Date(candidate);
         current.setDate(candidate.getDate() + offset);
         const hebrew = getHebrewParts(current);
-        if (hebrew.day === event.day && monthMatches(hebrew.month, event.month)) return current;
+        if (hebrew.day === event.day && monthMatches(hebrew.month, event.month)) {
+          nextOccurrenceCache.set(cacheKey, current.getTime());
+          return current;
+        }
       }
+
+      nextOccurrenceCache.set(cacheKey, null);
       return null;
     }
 
@@ -1245,49 +1282,45 @@
       return thousandsLetter + "'" + yearLetters.slice(0, -1) + '"' + yearLetters.slice(-1);
     }
 
-    // חילוץ השנה העברית מתוך תאריך לועזי
+    // חילוץ השנה העברית תוך שמירת התוצאה כדי למנוע חישובים חוזרים
     function getHebrewYear(date) {
-      const parts = new Intl.DateTimeFormat("en-u-ca-hebrew", { year: "numeric" }).formatToParts(date);
-      return Number(parts.find(part => part.type === "year").value.replace(/[^0-9]/g, ""));
+      const key = getDateCacheKey(date);
+      if (hebrewYearCache.has(key)) return hebrewYearCache.get(key);
+
+      const parts = hebrewYearFormatter.formatToParts(date);
+      const year = Number(parts.find(part => part.type === "year").value.replace(/[^0-9]/g, ""));
+      hebrewYearCache.set(key, year);
+      return year;
     }
 
-    // איתור התאריך הלועזי של יום ההולדת בתוך שנה עברית מסוימת
+    // איתור תאריך יום ההולדת בשנה עברית מסוימת ושמירת התוצאה במטמון
     function findHebrewDateInYear(event, hebrewYear) {
+      const cacheKey = hebrewYear + "|" + event.day + "|" + normalizeMonth(event.month);
+      if (hebrewDateInYearCache.has(cacheKey)) {
+        const cachedDate = hebrewDateInYearCache.get(cacheKey);
+        return cachedDate ? new Date(cachedDate) : null;
+      }
+
       const start = new Date(hebrewYear - 3761, 0, 1);
       for (let offset = 0; offset < 800; offset++) {
         const candidate = new Date(start);
         candidate.setDate(start.getDate() + offset);
         const parts = getHebrewParts(candidate);
-        if (getHebrewYear(candidate) === hebrewYear && parts.day === event.day && monthMatches(parts.month, event.month)) return candidate;
+        if (getHebrewYear(candidate) === hebrewYear && parts.day === event.day && monthMatches(parts.month, event.month)) {
+          hebrewDateInYearCache.set(cacheKey, candidate.getTime());
+          return candidate;
+        }
       }
+
+      hebrewDateInYearCache.set(cacheKey, null);
       return null;
     }
 
-    // חילוץ השנה העברית מתוך תאריך לועזי
-    function getHebrewYear(date) {
-      const parts = new Intl.DateTimeFormat("en-u-ca-hebrew", { year: "numeric" }).formatToParts(date);
-      return Number(parts.find(part => part.type === "year").value.replace(/[^0-9]/g, ""));
-    }
 
-    // איתור התאריך הלועזי של יום הולדת עברי בתוך שנה עברית מסוימת
-    function findHebrewDateInYear(event, hebrewYear) {
-      const start = new Date(hebrewYear - 3761, 0, 1);
-      for (let offset = 0; offset < 800; offset++) {
-        const candidate = new Date(start);
-        candidate.setDate(start.getDate() + offset);
-        const parts = getHebrewParts(candidate);
-        if (getHebrewYear(candidate) === hebrewYear && parts.day === event.day && monthMatches(parts.month, event.month)) return candidate;
-      }
-      return null;
-    }
 
     // יצירת תאריך עברי קריא באותיות, כולל השנה העברית
     function formatHebrewDate(date) {
-      const parts = new Intl.DateTimeFormat("he-IL-u-ca-hebrew", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      }).formatToParts(date);
+      const parts = hebrewFullDateFormatter.formatToParts(date);
       const dayNumber = Number(parts.find(part => part.type === "day").value.replace(/[^\d]/g, ""));
       const monthName = parts.find(part => part.type === "month").value.replace(/^ב(?=[א-ת])/, "");
       const yearNumber = Number(parts.find(part => part.type === "year").value.replace(/[^\d]/g, ""));
@@ -1437,14 +1470,23 @@
       return article;
     }
 
-    // איסוף כל האירועים והמרת התאריך העברי לתאריך הלועזי הקרוב
+    // חישוב רשימת האירועים פעם אחת ביום ושימוש חוזר בתוצאה בכל שינוי סינון
     function getCalculatedEvents() {
       const today = new Date();
       const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      return eventsData.map(event => {
+      const todayKey = getDateCacheKey(start);
+
+      if (calculatedEventsCache.dateKey === todayKey && calculatedEventsCache.events) {
+        return calculatedEventsCache.events;
+      }
+
+      const events = eventsData.map(event => {
         const date = findNextOccurrence(event, start);
         return date ? { ...event, date, daysLeft: daysBetween(start, date) } : null;
       }).filter(Boolean).sort((a, b) => a.date - b.date);
+
+      calculatedEventsCache = { dateKey: todayKey, events };
+      return events;
     }
 
     // מילוי רשימת המשפחות בתיבת הסינון
