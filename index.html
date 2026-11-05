@@ -705,7 +705,7 @@
       }
 
       const hebrew = document.createElement("span");
-      hebrew.textContent = "📅 " + (event.type === "birthday" ? "יום ההולדת הקרוב: " : "יום הנישואין הקרוב: ") + formatHebrewDate(date);
+      hebrew.textContent = "📅 " + (event.type === "birthday" ? "יום הולדת: " : "יום נישואין: ") + formatHebrewDate(date);
       dates.appendChild(hebrew);
 
       const gregorian = document.createElement("span");
