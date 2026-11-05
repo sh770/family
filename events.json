@@ -86,7 +86,8 @@
     "family": "הרפז",
     "day": 21,
     "month": "אלול",
-    "type": "anniversary"
+    "type": "anniversary",
+    "marriageYear": 5767
   },
   {
     "name": "ינון שלום",
@@ -167,7 +168,8 @@
     "family": "גלעדי",
     "day": 5,
     "month": "סיון",
-    "type": "anniversary"
+    "type": "anniversary",
+    "marriageYear": 5760
   },
   {
     "name": "שלמה אליעזר",
@@ -224,7 +226,8 @@
     "family": "כץ",
     "day": 12,
     "month": "שבט",
-    "type": "anniversary"
+    "type": "anniversary",
+    "marriageYear": 5763
   },
   {
     "name": "חיה מושקא",
@@ -347,7 +350,8 @@
     "family": "הרפז - משפחה נוספת",
     "day": 20,
     "month": "חשוון",
-    "type": "anniversary"
+    "type": "anniversary",
+    "marriageYear": 5775
   },
   {
     "name": "מרדכי",
@@ -412,7 +416,8 @@
     "family": "מריאין",
     "day": 1,
     "month": "תמוז",
-    "type": "anniversary"
+    "type": "anniversary",
+    "marriageYear": 5774
   },
   {
     "name": "דוד",
@@ -485,7 +490,8 @@
     "family": "אברמוב",
     "day": 2,
     "month": "שבט",
-    "type": "anniversary"
+    "type": "anniversary",
+    "marriageYear": 5775
   },
   {
     "name": "פייגא רות",
@@ -559,7 +565,8 @@
     "family": "שוורץ",
     "day": 24,
     "month": "שבט",
-    "type": "anniversary"
+    "type": "anniversary",
+    "marriageYear": 5781
   },
   {
     "name": "העטי לאה",
@@ -592,7 +599,8 @@
     "family": "הענדל",
     "day": 16,
     "month": "סיון",
-    "type": "anniversary"
+    "type": "anniversary",
+    "marriageYear": 5783
   },
   {
     "name": "אביטל הודיה",
@@ -617,6 +625,7 @@
     "family": "פרוכטר",
     "day": 15,
     "month": "סיון",
-    "type": "anniversary"
+    "type": "anniversary",
+    "marriageYear": 5784
   }
 ]
