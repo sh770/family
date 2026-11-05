@@ -719,6 +719,18 @@
           title.textContent = "יום הולדת: " + fullName + " – " + relationText + parents;
         }
       }
+
+      // הצגת הגיל לצד כותרת האדם כאשר שנת הלידה ידועה
+      if (event.type === "birthday" && event.birthYear) {
+        const todayForAge = new Date();
+        const currentHebrewYearForAge = getHebrewYear(todayForAge);
+        const birthdayForAge = findHebrewDateInYear(event, currentHebrewYearForAge);
+        if (birthdayForAge) {
+          const age = currentHebrewYearForAge - event.birthYear - (todayForAge < birthdayForAge ? 1 : 0);
+          title.textContent += " · 🎈 גיל " + age;
+        }
+      }
+
       content.appendChild(title);
 
       const dates = document.createElement("div");
@@ -743,13 +755,6 @@
           originalGregorian.textContent = "🗓️ תאריך לידה לועזי מקורי: " + gregorianDateFormatter.format(birthDate);
           dates.appendChild(originalGregorian);
 
-          // חישוב הגיל לפי השאלה אם יום ההולדת העברי כבר חל השנה
-          if (birthdayThisYear) {
-            const age = currentHebrewYear - event.birthYear - (today < birthdayThisYear ? 1 : 0);
-            const ageText = document.createElement("span");
-            ageText.textContent = "🎈 גיל: " + age;
-            dates.appendChild(ageText);
-          }
         }
 
         // הצגת המועד העברי והלועזי של יום ההולדת בשנה הנוכחית
