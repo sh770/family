@@ -518,11 +518,15 @@
 
     // המרת שם חודש עברי שמופק מהדפדפן לשם חודש אחיד
     function normalizeMonth(value) {
-      const month = normalizeHebrew(value);
-      if (month.includes("אדר") && month.includes("ב")) return "אדר ב";
-      if (month.includes("אדר") && month.includes("א")) return "אדר א";
-      if (month.includes("אדר")) return "אדר";
-      if (month.includes("מרחשוון") || month.includes("מר חשוון")) return "חשוון";
+      // הסרת אות השימוש ב' שמופיעה בתחילת שם החודש בתוצאות הדפדפן
+      const month = normalizeHebrew(value).replace(/^ב(?=[א-ת])/, "");
+      // זיהוי מדויק של אדר ראשון ושני, בלי לבלבל בינם לבין אדר רגיל
+      if (month === "אדר ב") return "אדר ב";
+      if (month === "אדר א") return "אדר א";
+      if (month === "אדר") return "אדר";
+      // איחוד שמות חלופיים של חודש חשוון
+      if (month === "מרחשוון" || month === "מר חשוון") return "חשוון";
+      // איחוד הכתיב סיוון עם הכתיב סיון שבנתוני המשפחה
       if (month === "סיוון") return "סיון";
       return month;
     }
@@ -721,19 +725,29 @@
       dates.className = "dates";
       content.appendChild(dates);
 
-      // הצגת שנת הלידה המקורית, הגיל ומועדי יום ההולדת בשנה העברית הנוכחית
+      // הצגת תאריך הלידה המקורי, שנת הלידה, הגיל ומועד יום ההולדת השנה
       if (event.type === "birthday" && event.birthYear) {
         const birthDate = findHebrewDateInYear(event, event.birthYear);
         const today = new Date();
         const currentHebrewYear = getHebrewYear(today);
         const birthdayThisYear = findHebrewDateInYear(event, currentHebrewYear);
 
+        // הצגת התאריך העברי והלועזי המקוריים כפי שנמסרו
         if (birthDate) {
+          const originalHebrew = document.createElement("span");
+          originalHebrew.textContent = "🎂 תאריך לידה מקורי: " + formatHebrewDate(birthDate);
+          dates.appendChild(originalHebrew);
+
+          const originalGregorian = document.createElement("span");
+          originalGregorian.textContent = "🗓️ תאריך לידה לועזי מקורי: " + gregorianDateFormatter.format(birthDate);
+          dates.appendChild(originalGregorian);
+
           const birthYearText = document.createElement("span");
-          birthYearText.textContent = "🎂 שנת לידה מקורית: " + formatHebrewYear(event.birthYear) + " (" + birthDate.getFullYear() + ")";
+          birthYearText.textContent = "שנת לידה מקורית: " + formatHebrewYear(event.birthYear) + " (" + birthDate.getFullYear() + ")";
           dates.appendChild(birthYearText);
         }
 
+        // חישוב הגיל לפי השאלה אם יום ההולדת העברי כבר חל השנה
         if (birthdayThisYear) {
           const age = currentHebrewYear - event.birthYear - (today < birthdayThisYear ? 1 : 0);
           const ageText = document.createElement("span");
