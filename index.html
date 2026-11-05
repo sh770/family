@@ -417,7 +417,7 @@
     // רשימת האירועים המשפחתיים, כולל שנות לידה רק כאשר נמסרו במפורש
     const eventsData = [
       {"name":"משה ראובן שלום","family":"משה ראובן שלום הרפז","day":27,"month":"טבת","type":"birthday","relation":"בעלה של","relatedName":"פנינה ייטל פערל"},
-      {"name":"פנינה ייטל פערל","family":"משה ראובן שלום הרפז","day":2,"month":"כסלו","type":"birthday","relation":"אשתו של","relatedName":"משה ראובן שלום"},
+      {"name":"פנינה ייטל פערל","family":"משה ראובן שלום הרפז","day":2,"month":"כסלו","type":"birthday","relation":"אשתו של","relatedName":"משה ראובן שלום","birthYear":5740},
       {"name":"רבקה","family":"משה ראובן שלום הרפז","day":3,"month":"כסלו","type":"birthday","relation":"בת"},
       {"name":"לוי יצחק","family":"משה ראובן שלום הרפז","day":1,"month":"תמוז","type":"birthday","relation":"בן"},
       {"name":"חיה מושקא","family":"משה ראובן שלום הרפז","day":22,"month":"אדר","type":"birthday","relation":"בת"},
@@ -725,35 +725,45 @@
       dates.className = "dates";
       content.appendChild(dates);
 
-      // הצגת תאריך הלידה המקורי, שנת הלידה, הגיל ומועד יום ההולדת השנה
-      if (event.type === "birthday" && event.birthYear) {
-        const birthDate = findHebrewDateInYear(event, event.birthYear);
+      // הצגת התאריך המקורי לכל יום הולדת, גם כאשר שנת הלידה אינה ידועה
+      if (event.type === "birthday") {
+        const originalDayMonth = document.createElement("span");
+        originalDayMonth.textContent = "🎂 תאריך לידה מקורי: " + numberToHebrewLetters(event.day) + " " + event.month;
+        dates.appendChild(originalDayMonth);
+
         const today = new Date();
         const currentHebrewYear = getHebrewYear(today);
         const birthdayThisYear = findHebrewDateInYear(event, currentHebrewYear);
 
-        // הצגת התאריך העברי והלועזי המקוריים כפי שנמסרו
-        if (birthDate) {
-          const originalHebrew = document.createElement("span");
-          originalHebrew.textContent = "🎂 תאריך לידה מקורי: " + formatHebrewDate(birthDate);
-          dates.appendChild(originalHebrew);
-
-          const originalGregorian = document.createElement("span");
-          originalGregorian.textContent = "🗓️ תאריך לידה לועזי מקורי: " + gregorianDateFormatter.format(birthDate);
-          dates.appendChild(originalGregorian);
-
+        // הצגת השנה והתאריך הלועזי המקורי רק אם שנת הלידה נמסרה
+        if (event.birthYear) {
+          const birthDate = findHebrewDateInYear(event, event.birthYear);
           const birthYearText = document.createElement("span");
-          birthYearText.textContent = "שנת לידה מקורית: " + formatHebrewYear(event.birthYear) + " (" + birthDate.getFullYear() + ")";
+          birthYearText.textContent = "שנת לידה מקורית: " + formatHebrewYear(event.birthYear);
           dates.appendChild(birthYearText);
+
+          // הצגת התאריך העברי המלא והמקבילה הלועזית כאשר נמצא תאריך מדויק
+          if (birthDate) {
+            const originalFullHebrew = document.createElement("span");
+            originalFullHebrew.textContent = "🎂 תאריך לידה עברי מלא: " + formatHebrewDate(birthDate);
+            dates.appendChild(originalFullHebrew);
+
+            const originalGregorian = document.createElement("span");
+            originalGregorian.textContent = "🗓️ תאריך לידה לועזי מקורי: " + gregorianDateFormatter.format(birthDate);
+            dates.appendChild(originalGregorian);
+          }
+
+          // חישוב הגיל לפי השאלה אם יום ההולדת העברי כבר חל השנה
+          if (birthdayThisYear) {
+            const age = currentHebrewYear - event.birthYear - (today < birthdayThisYear ? 1 : 0);
+            const ageText = document.createElement("span");
+            ageText.textContent = "🎈 גיל: " + age;
+            dates.appendChild(ageText);
+          }
         }
 
-        // חישוב הגיל לפי השאלה אם יום ההולדת העברי כבר חל השנה
+        // הצגת המועד העברי והלועזי של יום ההולדת בשנה הנוכחית
         if (birthdayThisYear) {
-          const age = currentHebrewYear - event.birthYear - (today < birthdayThisYear ? 1 : 0);
-          const ageText = document.createElement("span");
-          ageText.textContent = "🎈 גיל: " + age;
-          dates.appendChild(ageText);
-
           const hebrewThisYear = document.createElement("span");
           hebrewThisYear.textContent = "📅 יום הולדת עברי השנה: " + formatHebrewDate(birthdayThisYear);
           dates.appendChild(hebrewThisYear);
