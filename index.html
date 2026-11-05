@@ -242,6 +242,44 @@
       font-size: 11px;
     }
 
+    /* אזור הגדרות ההתראות */
+    .notifications {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: 14px;
+      margin-bottom: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+    }
+
+    /* כותרת והסבר של ההתראות */
+    .notification-info { flex: 1 1 220px; }
+    .notification-info strong { display: block; font-size: 14px; }
+    .notification-info small { color: var(--muted); font-size: 12px; }
+
+    /* בחירת מועד ההתראה וכפתור ההפעלה */
+    .notifications select, .notifications button {
+      min-height: 42px;
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      background: white;
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+    }
+    .notifications button {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #notificationStatus { flex-basis: 100%; color: var(--muted); font-size: 12px; }
+
     /* התאמה למסכים צרים */
     @media (max-width: 560px) {
       .summary { gap: 7px; }
@@ -302,6 +340,24 @@
           <option value="all">כל המשפחות</option>
         </select>
       </label>
+    </section>
+
+    <section class="notifications" aria-label="הגדרות התראות">
+      <div class="notification-info">
+        <strong>🔔 תזכורות על אירועים</strong>
+        <small>קבלת התראה בדפדפן כשהאתר פתוח</small>
+      </div>
+      <label style="flex: 0 1 180px;">
+        מתי להזכיר?
+        <select id="reminderDays">
+          <option value="0">ביום האירוע</option>
+          <option value="1">יום לפני</option>
+          <option value="3" selected>3 ימים לפני</option>
+          <option value="7">שבוע לפני</option>
+        </select>
+      </label>
+      <button type="button" id="enableNotifications">הפעלת התראות</button>
+      <span id="notificationStatus" role="status">ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.</span>
     </section>
 
     <div class="list-heading">
@@ -535,6 +591,11 @@
     // שמות ההורים של כל משפחה, לצורך הצגת הקשר של הילד באירוע
     const parent_map = {"הרפז": "משה ראובן שלום ופנינה ייטל פערל", "גלעדי": "ינון שלום וחנה", "כץ": "שלמה אליעזר וחוה הינדה", "הרשקוביץ": "חיה מושקא וצביקה", "הרפז - משפחה נוספת": "יוסף יצחק ורבקה רחל", "מריאין": "מרדכי וברכה נחמה", "אברמוב": "דוד ויהודית", "וייסגלס": "פייגא רות וברוך שלום", "הרפז - רשומה נוספת": "הורי המשפחה הרפז", "שוורץ": "רחל מושקא ולירון ליפא אברהם", "הענדל": "העטי לאה ושלום דוב בער הענדל", "פרוכטר": "אביטל הודיה וזכריה דוד"};
 
+    // הסרת תיאור המשפחה כדי להציג רק את שם המשפחה לצד שם בעל יום ההולדת
+    function getFamilySurname(family) {
+      return family.replace(/ - (משפחה נוספת|רשומה נוספת)$/, "");
+    }
+
     // בניית כרטיס אירוע באמצעות יצירת רכיבי HTML בטוחים
     function createEventCard(event, date, daysLeft) {
       const article = document.createElement("article");
@@ -569,7 +630,8 @@
       } else {
         const parents = parent_map[event.family] || "הורי משפחת " + event.family;
         const relationText = event.relation === "בת" ? "בתם של " : event.relation === "בנות" ? "בנותיהם של " : "בנם של ";
-        title.textContent = "יום הולדת: " + event.name + " – " + relationText + parents;
+        const surname = getFamilySurname(event.family);
+        title.textContent = "יום הולדת: " + event.name + " " + surname + " – " + relationText + parents;
       }
       content.appendChild(title);
 
@@ -645,9 +707,92 @@
     document.getElementById("kind").addEventListener("change", renderEvents);
     document.getElementById("family").addEventListener("change", renderEvents);
 
-    // אתחול רשימת המשפחות והצגת האירועים הראשונית
+    // שמירת הגדרות ההתראות בדפדפן ובדיקת הרשאות קיימות
+    const reminderDaysSelect = document.getElementById("reminderDays");
+    const notificationButton = document.getElementById("enableNotifications");
+    const notificationStatus = document.getElementById("notificationStatus");
+    const notificationPreferenceKey = "familyEventsNotificationsEnabled";
+    const reminderPreferenceKey = "familyEventsReminderDays";
+    const sentNotificationsKey = "familyEventsSentNotifications";
+
+    // טעינת מספר הימים שנבחרו לתזכורת
+    reminderDaysSelect.value = localStorage.getItem(reminderPreferenceKey) || "3";
+
+    // הצגת מצב ההתראות הנוכחי למשתמש
+    function updateNotificationStatus() {
+      const enabled = localStorage.getItem(notificationPreferenceKey) === "true";
+      if (!("Notification" in window)) {
+        notificationStatus.textContent = "הדפדפן הזה אינו תומך בהתראות.";
+        notificationButton.disabled = true;
+      } else if (Notification.permission === "denied") {
+        notificationStatus.textContent = "ההתראות חסומות בהגדרות הדפדפן. יש לאפשר אותן דרך הגדרות האתר.";
+      } else if (enabled && Notification.permission === "granted") {
+        notificationStatus.textContent = "ההתראות פעילות. התזכורת תישלח " + reminderDaysSelect.options[reminderDaysSelect.selectedIndex].text + ".";
+        notificationButton.textContent = "כיבוי התראות";
+      } else {
+        notificationStatus.textContent = "ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.";
+        notificationButton.textContent = "הפעלת התראות";
+      }
+    }
+
+    // שליחת התראה חד-פעמית עבור אירוע במועד שנבחר
+    function checkUpcomingNotifications() {
+      if (!("Notification" in window) || Notification.permission !== "granted" || localStorage.getItem(notificationPreferenceKey) !== "true") return;
+      const daysBefore = Number(reminderDaysSelect.value);
+      const sent = JSON.parse(localStorage.getItem(sentNotificationsKey) || "[]");
+      const upcoming = getCalculatedEvents();
+      upcoming.filter(event => event.daysLeft === daysBefore).forEach(event => {
+        const eventKey = [event.family, event.name, event.type, event.date.getFullYear(), event.date.getMonth(), event.date.getDate()].join("|");
+        if (sent.includes(eventKey)) return;
+        const eventLabel = event.type === "birthday" ? "יום הולדת של " + event.name + " " + getFamilySurname(event.family) : "יום נישואין למשפחת " + getFamilySurname(event.family);
+        const notification = new Notification("תזכורת לאירוע משפחתי", {
+          body: eventLabel + (daysBefore === 0 ? " חל היום!" : " בעוד " + daysBefore + " ימים."),
+          icon: ""
+        });
+        notification.onclick = () => window.focus();
+        sent.push(eventKey);
+      });
+      localStorage.setItem(sentNotificationsKey, JSON.stringify(sent.slice(-300)));
+    }
+
+    // שמירת בחירת מועד התזכורת ועדכון המצב
+    reminderDaysSelect.addEventListener("change", () => {
+      localStorage.setItem(reminderPreferenceKey, reminderDaysSelect.value);
+      updateNotificationStatus();
+      checkUpcomingNotifications();
+    });
+
+    // הפעלה או כיבוי של התראות לאחר לחיצה מפורשת של המשתמש
+    notificationButton.addEventListener("click", async () => {
+      if (!("Notification" in window)) {
+        updateNotificationStatus();
+        return;
+      }
+      if (localStorage.getItem(notificationPreferenceKey) === "true") {
+        localStorage.setItem(notificationPreferenceKey, "false");
+        updateNotificationStatus();
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        localStorage.setItem(notificationPreferenceKey, "true");
+        localStorage.setItem(reminderPreferenceKey, reminderDaysSelect.value);
+        checkUpcomingNotifications();
+      }
+      updateNotificationStatus();
+    });
+
+    // בדיקת התראות בפתיחת האתר, בחזרה ללשונית ובמרווחי זמן קבועים
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) checkUpcomingNotifications();
+    });
+    window.setInterval(checkUpcomingNotifications, 60000);
+
+    // אתחול רשימת המשפחות, הצגת האירועים ובדיקת ההתראות הראשונית
     populateFamilies();
     renderEvents();
+    updateNotificationStatus();
+    checkUpcomingNotifications();
   </script>
 </body>
 </html>
