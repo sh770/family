@@ -1,0 +1,47 @@
+# מפרסמים את האתר ב-GitHub Pages בכל דחיפה לענף main
+name: פרסום האתר ב-GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# מעניקים ל-GitHub Actions הרשאות לפרסם את האתר
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# מונעים מפרסומים מקבילים לדרוס זה את זה
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    # מריצים את הפרסום על שרת Ubuntu
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      # מורידים את קובצי המאגר
+      - name: הורדת קובצי המאגר
+        uses: actions/checkout@v4
+
+      # מגדירים את GitHub Pages עבור הפרויקט
+      - name: הגדרת GitHub Pages
+        uses: actions/configure-pages@v5
+
+      # אורזים את קובצי האתר לפרסום
+      - name: הכנת קובצי האתר
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      # מפרסמים את האתר
+      - name: פרסום האתר
+        id: deployment
+        uses: actions/deploy-pages@v4
