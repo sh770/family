@@ -1337,6 +1337,16 @@
     }
 
     // בניית כרטיס אירוע באמצעות יצירת רכיבי HTML בטוחים
+    // איתור שמות בני הזוג לפי רשומות ימי ההולדת של אותה משפחה
+    function getAnniversaryCoupleLabel(family) {
+      const familyBirthdays = eventsData.filter(event => event.family === family && event.type === "birthday");
+      const husband = familyBirthdays.find(event => event.relation === "בעלה של");
+      const wife = familyBirthdays.find(event => event.relation === "אשתו של");
+      const husbandName = husband?.name || wife?.relatedName;
+      const wifeName = husband?.relatedName || wife?.name;
+      return husbandName && wifeName ? husbandName + " ו" + wifeName : null;
+    }
+
     function createEventCard(event, date, daysLeft) {
       const article = document.createElement("article");
       article.className = "event";
@@ -1367,13 +1377,14 @@
       title.className = "event-title";
       if (event.type === "anniversary") {
         const familyLabel = event.family.replace(" - משפחה נוספת", "").replace(" - רשומה נוספת", "");
+        const coupleLabel = getAnniversaryCoupleLabel(event.family);
         if (event.marriageYear) {
           const yearParts = new Intl.DateTimeFormat("en-u-ca-hebrew", { year: "numeric" }).formatToParts(date);
           const eventHebrewYear = Number(yearParts.find(part => part.type === "year").value.replace(/[^0-9]/g, ""));
           const anniversaryNumber = eventHebrewYear - event.marriageYear;
-          title.textContent = "יום נישואין" + (anniversaryNumber > 0 ? " ה־" + anniversaryNumber : "") + " למשפחת " + familyLabel;
+          title.textContent = "יום נישואין" + (anniversaryNumber > 0 ? " ה־" + anniversaryNumber : "") + (coupleLabel ? " של " + coupleLabel : " למשפחת " + familyLabel);
         } else {
-          title.textContent = "יום נישואין למשפחת " + familyLabel;
+          title.textContent = coupleLabel ? "יום נישואין של " + coupleLabel : "יום נישואין למשפחת " + familyLabel;
         }
       } else {
         const surname = getFamilySurname(event.family);
@@ -1597,7 +1608,8 @@
       upcoming.filter(event => event.daysLeft === daysBefore).forEach(event => {
         const eventKey = [event.family, event.name, event.type, event.date.getFullYear(), event.date.getMonth(), event.date.getDate()].join("|");
         if (sent.includes(eventKey)) return;
-        const eventLabel = event.type === "birthday" ? "יום הולדת של " + event.name + " " + getFamilySurname(event.family) : "יום נישואין למשפחת " + getFamilySurname(event.family);
+        const coupleLabel = event.type === "anniversary" ? getAnniversaryCoupleLabel(event.family) : null;
+        const eventLabel = event.type === "birthday" ? "יום הולדת של " + event.name + " " + getFamilySurname(event.family) : coupleLabel ? "יום נישואין של " + coupleLabel : "יום נישואין למשפחת " + getFamilySurname(event.family);
         const notification = new Notification("תזכורת לאירוע משפחתי", {
           body: eventLabel + (daysBefore === 0 ? " חל היום!" : " בעוד " + daysBefore + " ימים."),
         });
