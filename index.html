@@ -416,7 +416,7 @@
     const eventsData = [
       // משפחת הרפז - הורים, ילדים ויום נישואין
       { name: "משה ראובן שלום", family: "הרפז", day: 27, month: "טבת", type: "birthday", relation: "בן" },
-      { name: "פנינה ייטל פערל", family: "הרפז", day: 2, month: "כסלו", type: "birthday", relation: "בת" },
+      { name: "פנינה ייטל פערל", family: "הרפז", day: 2, month: "כסלו", type: "birthday", relation: "אשתו של", relatedName: "משה ראובן שלום" },
       { name: "רבקה", family: "הרפז", day: 3, month: "כסלו", type: "birthday", relation: "בת" },
       { name: "לוי יצחק", family: "הרפז", day: 1, month: "תמוז", type: "birthday", relation: "בן" },
       { name: "חיה מושקא", family: "הרפז", day: 22, month: "אדר", type: "birthday", relation: "בת" },
@@ -679,7 +679,7 @@
       } else {
         const surname = getFamilySurname(event.family);
         const fullName = event.name.endsWith(surname) ? event.name : event.name + " " + surname;
-        if (event.relatedName && (event.relation === "בעלה של" || event.relation === "כלתו של")) {
+        if (event.relatedName && (event.relation === "בעלה של" || event.relation === "אשתו של" || event.relation === "כלתו של")) {
           title.textContent = "יום הולדת: " + fullName + " – " + event.relation + " " + event.relatedName;
         } else {
           const parents = parent_map[event.family] || "הורי משפחת " + event.family;
