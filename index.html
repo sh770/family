@@ -631,7 +631,8 @@
         const parents = parent_map[event.family] || "הורי משפחת " + event.family;
         const relationText = event.relation === "בת" ? "בתם של " : event.relation === "בנות" ? "בנותיהם של " : "בנם של ";
         const surname = getFamilySurname(event.family);
-        title.textContent = "יום הולדת: " + event.name + " " + surname + " – " + relationText + parents;
+        const fullName = event.name.endsWith(surname) ? event.name : event.name + " " + surname;
+        title.textContent = "יום הולדת: " + fullName + " – " + relationText + parents;
       }
       content.appendChild(title);
 
@@ -747,7 +748,6 @@
         const eventLabel = event.type === "birthday" ? "יום הולדת של " + event.name + " " + getFamilySurname(event.family) : "יום נישואין למשפחת " + getFamilySurname(event.family);
         const notification = new Notification("תזכורת לאירוע משפחתי", {
           body: eventLabel + (daysBefore === 0 ? " חל היום!" : " בעוד " + daysBefore + " ימים."),
-          icon: ""
         });
         notification.onclick = () => window.focus();
         sent.push(eventKey);
