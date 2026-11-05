@@ -17,6 +17,31 @@
       --line: #e2e8f0;
       --birthday: #176b57;
       --anniversary: #8056a5;
+      --field-bg: #ffffff;
+      --field-border: #cbd5e1;
+      --tag-birthday-bg: #e7f5f0;
+      --tag-anniversary-bg: #f1eafa;
+      --empty-bg: #ffffff;
+      --date-text: #48596b;
+    }
+
+    /* צבעי הממשק במצב כהה */
+    body[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #101923;
+      --card: #1b2937;
+      --text: #e7edf4;
+      --muted: #a8b6c5;
+      --primary: #7db4df;
+      --line: #344657;
+      --birthday: #6bc5a7;
+      --anniversary: #c3a0e8;
+      --field-bg: #243444;
+      --field-border: #506477;
+      --tag-birthday-bg: #203e39;
+      --tag-anniversary-bg: #382c49;
+      --empty-bg: #1b2937;
+      --date-text: #c0ccd8;
     }
 
     /* איפוס בסיסי והתאמת גודל רכיבים */
@@ -120,7 +145,7 @@
       padding: 8px 10px;
       border: 1px solid #cbd5e1;
       border-radius: 9px;
-      background: white;
+      background: var(--field-bg);
       color: var(--text);
       font: inherit;
       font-size: 14px;
@@ -193,13 +218,13 @@
     /* צבע תגית יום הולדת */
     .tag.birthday {
       color: var(--birthday);
-      background: #e7f5f0;
+      background: var(--tag-birthday-bg);
     }
 
     /* צבע תגית יום נישואין */
     .tag.anniversary {
       color: var(--anniversary);
-      background: #f1eafa;
+      background: var(--tag-anniversary-bg);
     }
 
     /* תצוגת מספר הימים שנותרו */
@@ -221,7 +246,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 7px 18px;
-      color: #48596b;
+      color: var(--date-text);
       font-size: 13px;
     }
 
@@ -230,7 +255,7 @@
       padding: 28px 16px;
       border: 1px dashed #bdc9d6;
       border-radius: 14px;
-      background: white;
+      background: var(--empty-bg);
       color: var(--muted);
       text-align: center;
     }
@@ -266,7 +291,7 @@
       padding: 8px 12px;
       border: 1px solid #cbd5e1;
       border-radius: 9px;
-      background: white;
+      background: var(--field-bg);
       color: var(--text);
       font: inherit;
       font-size: 14px;
@@ -279,6 +304,20 @@
       cursor: pointer;
     }
     #notificationStatus { flex-basis: 100%; color: var(--muted); font-size: 12px; }
+
+    /* כפתור החלפת מצב התצוגה */
+    .theme-toggle {
+      margin-top: 14px;
+      min-height: 40px;
+      padding: 8px 13px;
+      border: 1px solid #ffffff70;
+      border-radius: 10px;
+      background: #ffffff18;
+      color: white;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
     /* התאמה למסכים צרים */
     @media (max-width: 560px) {
@@ -297,6 +336,7 @@
     <div class="wrap">
       <h1>לוח אירועים משפחתי</h1>
       <p class="subtitle">ימי הולדת וימי נישואין לפי התאריך העברי, עם התאריך הלועזי הקרוב</p>
+      <button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false">🌙 מצב כהה</button>
     </div>
   </header>
 
@@ -345,7 +385,7 @@
     <section class="notifications" aria-label="הגדרות התראות">
       <div class="notification-info">
         <strong>🔔 תזכורות על אירועים</strong>
-        <small>קבלת התראה בדפדפן כשהאתר פתוח</small>
+        <small>בדיקת תמיכה ובקשת הרשאה להתראות בדפדפן</small>
       </div>
       <label style="flex: 0 1 180px;">
         מתי להזכיר?
@@ -356,7 +396,7 @@
           <option value="7">שבוע לפני</option>
         </select>
       </label>
-      <button type="button" id="enableNotifications">הפעלת התראות</button>
+      <button type="button" id="enableNotifications">בדיקת והפעלת התראות</button>
       <span id="notificationStatus" role="status">ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.</span>
     </section>
 
@@ -575,6 +615,15 @@
       return letters.slice(0, -1) + "״" + letters.slice(-1);
     }
 
+    // המרת שנה עברית לפורמט המבוקש, לדוגמה ה'תשמ"א
+    function formatHebrewYear(year) {
+      const thousands = Math.floor(year / 1000);
+      const remainder = year % 1000;
+      const thousandsLetter = numberToHebrewLetters(thousands).replace(/[׳״']/g, "");
+      const yearLetters = numberToHebrewLetters(remainder).replace(/[׳״"]/g, "");
+      return thousandsLetter + "'" + yearLetters.slice(0, -1) + '"' + yearLetters.slice(-1);
+    }
+
     // יצירת תאריך עברי קריא באותיות, כולל השנה העברית
     function formatHebrewDate(date) {
       const parts = new Intl.DateTimeFormat("he-IL-u-ca-hebrew", {
@@ -585,7 +634,7 @@
       const dayNumber = Number(parts.find(part => part.type === "day").value.replace(/[^\d]/g, ""));
       const monthName = parts.find(part => part.type === "month").value.replace(/^[בכ]/, "");
       const yearNumber = Number(parts.find(part => part.type === "year").value.replace(/[^\d]/g, ""));
-      return numberToHebrewLetters(dayNumber) + " " + monthName + " " + numberToHebrewLetters(yearNumber);
+      return numberToHebrewLetters(dayNumber) + " " + monthName + " " + formatHebrewYear(yearNumber);
     }
 
     // שמות ההורים של כל משפחה, לצורך הצגת הקשר של הילד באירוע
@@ -708,6 +757,26 @@
     document.getElementById("kind").addEventListener("change", renderEvents);
     document.getElementById("family").addEventListener("change", renderEvents);
 
+    // שמירת הגדרות מצב התצוגה והחלתה בעת פתיחת האתר
+    const themeToggle = document.getElementById("themeToggle");
+    const themePreferenceKey = "familyEventsTheme";
+
+    // החלת מצב בהיר או כהה ושמירת התאמת צבע שורת הדפדפן
+    function applyTheme(theme) {
+      document.body.dataset.theme = theme;
+      const darkMode = theme === "dark";
+      themeToggle.textContent = darkMode ? "☀️ מצב בהיר" : "🌙 מצב כהה";
+      themeToggle.setAttribute("aria-pressed", String(darkMode));
+      document.querySelector('meta[name="theme-color"]').content = darkMode ? "#101923" : "#17324d";
+    }
+
+    // החלפת מצב התצוגה ושמירת הבחירה במכשיר
+    themeToggle.addEventListener("click", () => {
+      const nextTheme = document.body.dataset.theme === "dark" ? "light" : "dark";
+      localStorage.setItem(themePreferenceKey, nextTheme);
+      applyTheme(nextTheme);
+    });
+
     // שמירת הגדרות ההתראות בדפדפן ובדיקת הרשאות קיימות
     const reminderDaysSelect = document.getElementById("reminderDays");
     const notificationButton = document.getElementById("enableNotifications");
@@ -725,14 +794,18 @@
       if (!("Notification" in window)) {
         notificationStatus.textContent = "הדפדפן הזה אינו תומך בהתראות.";
         notificationButton.disabled = true;
+      } else if (!window.isSecureContext) {
+        notificationStatus.textContent = "ההתראות דורשות חיבור מאובטח HTTPS.";
+        notificationButton.disabled = true;
       } else if (Notification.permission === "denied") {
-        notificationStatus.textContent = "ההתראות חסומות בהגדרות הדפדפן. יש לאפשר אותן דרך הגדרות האתר.";
+        notificationStatus.textContent = "ההתראות נחסמו בעבר. יש לאפשר אותן דרך הגדרות האתר בדפדפן.";
+        notificationButton.textContent = "בדיקת הרשאת התראות";
       } else if (enabled && Notification.permission === "granted") {
         notificationStatus.textContent = "ההתראות פעילות. התזכורת תישלח " + reminderDaysSelect.options[reminderDaysSelect.selectedIndex].text + ".";
         notificationButton.textContent = "כיבוי התראות";
       } else {
         notificationStatus.textContent = "ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.";
-        notificationButton.textContent = "הפעלת התראות";
+        notificationButton.textContent = "בדיקת והפעלת התראות";
       }
     }
 
@@ -764,20 +837,27 @@
 
     // הפעלה או כיבוי של התראות לאחר לחיצה מפורשת של המשתמש
     notificationButton.addEventListener("click", async () => {
-      if (!("Notification" in window)) {
+      // בודקים תמיכה בדפדפן ובחיבור מאובטח לפני בקשת ההרשאה
+      if (!("Notification" in window) || !window.isSecureContext) {
         updateNotificationStatus();
         return;
       }
+      // לחיצה נוספת מכבה את ההתראות המקומיות
       if (localStorage.getItem(notificationPreferenceKey) === "true") {
         localStorage.setItem(notificationPreferenceKey, "false");
         updateNotificationStatus();
         return;
       }
+      // מבקשים מהמשתמש אישור מפורש להצגת הודעות קופצות
       const permission = await Notification.requestPermission();
       if (permission === "granted") {
         localStorage.setItem(notificationPreferenceKey, "true");
         localStorage.setItem(reminderPreferenceKey, reminderDaysSelect.value);
         checkUpcomingNotifications();
+      } else if (permission === "denied") {
+        notificationStatus.textContent = "לא ניתנה הרשאה. אפשר לשנות זאת בהגדרות האתר בדפדפן.";
+      } else {
+        notificationStatus.textContent = "ההרשאה לא אושרה. ניתן לנסות שוב בלחיצה על הכפתור.";
       }
       updateNotificationStatus();
     });
@@ -787,6 +867,9 @@
       if (!document.hidden) checkUpcomingNotifications();
     });
     window.setInterval(checkUpcomingNotifications, 60000);
+
+    // אתחול מצב התצוגה לפי הבחירה השמורה במכשיר
+    applyTheme(localStorage.getItem(themePreferenceKey) || "light");
 
     // אתחול רשימת המשפחות, הצגת האירועים ובדיקת ההתראות הראשונית
     populateFamilies();
