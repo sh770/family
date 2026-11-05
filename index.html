@@ -721,39 +721,32 @@
       dates.className = "dates";
       content.appendChild(dates);
 
-      // הצגת שנת הלידה המקורית והגיל רק כאשר שנת הלידה ידועה
+      // הצגת שנת הלידה המקורית, הגיל ומועדי יום ההולדת בשנה העברית הנוכחית
       if (event.type === "birthday" && event.birthYear) {
         const birthDate = findHebrewDateInYear(event, event.birthYear);
+        const today = new Date();
+        const currentHebrewYear = getHebrewYear(today);
+        const birthdayThisYear = findHebrewDateInYear(event, currentHebrewYear);
+
         if (birthDate) {
           const birthYearText = document.createElement("span");
           birthYearText.textContent = "🎂 שנת לידה מקורית: " + formatHebrewYear(event.birthYear) + " (" + birthDate.getFullYear() + ")";
           dates.appendChild(birthYearText);
-
-          const today = new Date();
-          const currentHebrewYear = getHebrewYear(today);
-          const birthdayThisYear = findHebrewDateInYear(event, currentHebrewYear);
-          const age = currentHebrewYear - event.birthYear - (birthdayThisYear && today < birthdayThisYear ? 1 : 0);
-          const ageText = document.createElement("span");
-          ageText.textContent = "🎈 גיל: " + age;
-          dates.appendChild(ageText);
         }
-      }
 
-      // הצגת שנת הלידה המקורית והגיל רק כאשר שנת הלידה ידועה
-      if (event.type === "birthday" && event.birthYear) {
-        const birthDate = findHebrewDateInYear(event, event.birthYear);
-        if (birthDate) {
-          const birthYearText = document.createElement("span");
-          birthYearText.textContent = "🎂 שנת לידה מקורית: " + formatHebrewYear(event.birthYear) + " (" + birthDate.getFullYear() + ")";
-          dates.appendChild(birthYearText);
-
-          const today = new Date();
-          const currentHebrewYear = getHebrewYear(today);
-          const birthdayThisYear = findHebrewDateInYear(event, currentHebrewYear);
-          const age = currentHebrewYear - event.birthYear - (birthdayThisYear && today < birthdayThisYear ? 1 : 0);
+        if (birthdayThisYear) {
+          const age = currentHebrewYear - event.birthYear - (today < birthdayThisYear ? 1 : 0);
           const ageText = document.createElement("span");
           ageText.textContent = "🎈 גיל: " + age;
           dates.appendChild(ageText);
+
+          const hebrewThisYear = document.createElement("span");
+          hebrewThisYear.textContent = "📅 יום הולדת עברי השנה: " + formatHebrewDate(birthdayThisYear);
+          dates.appendChild(hebrewThisYear);
+
+          const gregorianThisYear = document.createElement("span");
+          gregorianThisYear.textContent = "🗓️ יום הולדת לועזי השנה: " + gregorianDateFormatter.format(birthdayThisYear);
+          dates.appendChild(gregorianThisYear);
         }
       }
 
