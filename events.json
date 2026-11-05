@@ -1,0 +1,601 @@
+[
+  {
+    "name": "משה ראובן שלום",
+    "family": "הרפז",
+    "day": 27,
+    "month": "טבת",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "פנינה ייטל פערל",
+    "family": "הרפז",
+    "day": 2,
+    "month": "כסלו",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "רבקה",
+    "family": "הרפז",
+    "day": 3,
+    "month": "כסלו",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "לוי יצחק",
+    "family": "הרפז",
+    "day": 1,
+    "month": "תמוז",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "חיה מושקא",
+    "family": "הרפז",
+    "day": 22,
+    "month": "אדר",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "דבורה לאה",
+    "family": "הרפז",
+    "day": 5,
+    "month": "סיון",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "דובער",
+    "family": "הרפז",
+    "day": 20,
+    "month": "סיון",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "מנוחה רחל",
+    "family": "הרפז",
+    "day": 1,
+    "month": "חשוון",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "שניאור זלמן",
+    "family": "הרפז",
+    "day": 14,
+    "month": "כסלו",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "שמואל",
+    "family": "הרפז",
+    "day": 4,
+    "month": "תשרי",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "משפחת הרפז",
+    "family": "הרפז",
+    "day": 21,
+    "month": "אלול",
+    "type": "anniversary"
+  },
+  {
+    "name": "ינון שלום",
+    "family": "גלעדי",
+    "day": 21,
+    "month": "שבט",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "חנה",
+    "family": "גלעדי",
+    "day": 11,
+    "month": "אב",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "רחל מושקא",
+    "family": "גלעדי",
+    "day": 26,
+    "month": "תשרי",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "אביטל הודיה",
+    "family": "גלעדי",
+    "day": 9,
+    "month": "שבט",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "הלל אמונה",
+    "family": "גלעדי",
+    "day": 2,
+    "month": "אדר",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "מנחם מענדל אביעד",
+    "family": "גלעדי",
+    "day": 9,
+    "month": "ניסן",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "שמואל",
+    "family": "גלעדי",
+    "day": 20,
+    "month": "אדר ב",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "שניאור זלמן",
+    "family": "גלעדי",
+    "day": 15,
+    "month": "ניסן",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "שירה יהודית",
+    "family": "גלעדי",
+    "day": 26,
+    "month": "סיון",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "משפחת גלעדי",
+    "family": "גלעדי",
+    "day": 5,
+    "month": "סיון",
+    "type": "anniversary"
+  },
+  {
+    "name": "שלמה אליעזר",
+    "family": "כץ",
+    "day": 19,
+    "month": "שבט",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "חוה הינדה",
+    "family": "כץ",
+    "day": 22,
+    "month": "סיון",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "העטי לאה",
+    "family": "כץ",
+    "day": 12,
+    "month": "חשוון",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "לוי יצחק",
+    "family": "כץ",
+    "day": 26,
+    "month": "אדר ב",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "רבקה",
+    "family": "כץ",
+    "day": 10,
+    "month": "אב",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "חיה מוסיא וחנה",
+    "family": "כץ",
+    "day": 27,
+    "month": "כסלו",
+    "type": "birthday",
+    "relation": "בנות"
+  },
+  {
+    "name": "משפחת כץ",
+    "family": "כץ",
+    "day": 12,
+    "month": "שבט",
+    "type": "anniversary"
+  },
+  {
+    "name": "חיה מושקא",
+    "family": "הרשקוביץ",
+    "day": 3,
+    "month": "אדר",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "צביקה",
+    "family": "הרשקוביץ",
+    "day": 25,
+    "month": "כסלו",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "ליאור מרדכי",
+    "family": "הרשקוביץ",
+    "day": 20,
+    "month": "טבת",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "לילי",
+    "family": "הרשקוביץ",
+    "day": 16,
+    "month": "תמוז",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "דבורה",
+    "family": "הרשקוביץ",
+    "day": 11,
+    "month": "חשוון",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "יוסף יצחק",
+    "family": "הרפז - משפחה נוספת",
+    "day": 19,
+    "month": "תמוז",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "רבקה רחל",
+    "family": "הרפז - משפחה נוספת",
+    "day": 7,
+    "month": "כסלו",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "חיה מושקא",
+    "family": "הרפז - משפחה נוספת",
+    "day": 22,
+    "month": "אייר",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "חנה",
+    "family": "הרפז - משפחה נוספת",
+    "day": 9,
+    "month": "חשוון",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "שניאור זלמן",
+    "family": "הרפז - משפחה נוספת",
+    "day": 24,
+    "month": "כסלו",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "דבורה לאה",
+    "family": "הרפז - משפחה נוספת",
+    "day": 18,
+    "month": "אלול",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "מנחם מענדל",
+    "family": "הרפז - משפחה נוספת",
+    "day": 4,
+    "month": "תשרי",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "שושנה ברכה",
+    "family": "הרפז - משפחה נוספת",
+    "day": 24,
+    "month": "תמוז",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "מנוחה",
+    "family": "הרפז - משפחה נוספת",
+    "day": 13,
+    "month": "אב",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "משפחת הרפז",
+    "family": "הרפז - משפחה נוספת",
+    "day": 20,
+    "month": "חשוון",
+    "type": "anniversary"
+  },
+  {
+    "name": "מרדכי",
+    "family": "מריאין",
+    "day": 24,
+    "month": "תמוז",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "ברכה נחמה",
+    "family": "מריאין",
+    "day": 7,
+    "month": "טבת",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "מנחם מענדל",
+    "family": "מריאין",
+    "day": 20,
+    "month": "ניסן",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "חיה מושקא",
+    "family": "מריאין",
+    "day": 27,
+    "month": "אייר",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "אמונה רבקה",
+    "family": "מריאין",
+    "day": 11,
+    "month": "שבט",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "חנה",
+    "family": "מריאין",
+    "day": 6,
+    "month": "תשרי",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "שמואל נתן",
+    "family": "מריאין",
+    "day": 2,
+    "month": "אייר",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "משפחת מריאין",
+    "family": "מריאין",
+    "day": 1,
+    "month": "תמוז",
+    "type": "anniversary"
+  },
+  {
+    "name": "דוד",
+    "family": "אברמוב",
+    "day": 28,
+    "month": "כסלו",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "יהודית",
+    "family": "אברמוב",
+    "day": 1,
+    "month": "תשרי",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "חנה",
+    "family": "אברמוב",
+    "day": 26,
+    "month": "שבט",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "חיה מושקא",
+    "family": "אברמוב",
+    "day": 5,
+    "month": "אלול",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "יעקב אורי",
+    "family": "אברמוב",
+    "day": 20,
+    "month": "תשרי",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "שמואל",
+    "family": "אברמוב",
+    "day": 26,
+    "month": "חשוון",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "רפאל מנחם",
+    "family": "אברמוב",
+    "day": 7,
+    "month": "סיון",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "הלל תמר",
+    "family": "אברמוב",
+    "day": 19,
+    "month": "תשרי",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "משפחת אברמוב",
+    "family": "אברמוב",
+    "day": 2,
+    "month": "שבט",
+    "type": "anniversary"
+  },
+  {
+    "name": "פייגא רות",
+    "family": "וייסגלס",
+    "day": 21,
+    "month": "סיון",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "רבקה",
+    "family": "הרפז - רשומה נוספת",
+    "day": 12,
+    "month": "שבט",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "מנחם מענדל יהושע זעליג",
+    "family": "הרפז - רשומה נוספת",
+    "day": 3,
+    "month": "כסלו",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "חיים מרדכי",
+    "family": "הרפז - רשומה נוספת",
+    "day": 2,
+    "month": "חשוון",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "רחל מושקא",
+    "family": "שוורץ",
+    "day": 26,
+    "month": "תשרי",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "לירון ליפא אברהם",
+    "family": "שוורץ",
+    "day": 28,
+    "month": "כסלו",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "דבורה לאה",
+    "family": "שוורץ",
+    "day": 1,
+    "month": "אדר",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "שיינא",
+    "family": "שוורץ",
+    "day": 9,
+    "month": "סיון",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "משפחת שוורץ",
+    "family": "שוורץ",
+    "day": 24,
+    "month": "שבט",
+    "type": "anniversary"
+  },
+  {
+    "name": "העטי לאה",
+    "family": "הענדל",
+    "day": 12,
+    "month": "חשוון",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "שלום דוב בער הענדל",
+    "family": "הענדל",
+    "day": 4,
+    "month": "אב",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "מושקא",
+    "family": "הענדל",
+    "day": 29,
+    "month": "תמוז",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "משפחת הענדל",
+    "family": "הענדל",
+    "day": 16,
+    "month": "סיון",
+    "type": "anniversary"
+  },
+  {
+    "name": "אביטל הודיה",
+    "family": "פרוכטר",
+    "day": 9,
+    "month": "שבט",
+    "type": "birthday",
+    "relation": "בת"
+  },
+  {
+    "name": "זכריה דוד (זק)",
+    "family": "פרוכטר",
+    "day": 16,
+    "month": "חשוון",
+    "type": "birthday",
+    "relation": "בן"
+  },
+  {
+    "name": "משפחת פרוכטר",
+    "family": "פרוכטר",
+    "day": 15,
+    "month": "סיון",
+    "type": "anniversary"
+  }
+]
