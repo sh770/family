@@ -415,8 +415,8 @@
     // רשימת האירועים שנלקחו מהטקסט שסופק, כולל תאריכים עבריים ללא תלות בשנת הלידה
     const eventsData = [
       // משפחת הרפז - הורים, ילדים ויום נישואין
-      { name: "משה ראובן שלום", family: "הרפז", day: 27, month: "טבת", type: "birthday", relation: "בן" },
-      { name: "פנינה ייטל פערל", family: "הרפז", day: 2, month: "כסלו", type: "birthday", relation: "אשתו של", relatedName: "משה ראובן שלום" },
+      { name: "משה ראובן שלום", family: "הרפז", day: 27, month: "טבת", type: "birthday" },
+      { name: "פנינה ייטל פערל", family: "הרפז", day: 2, month: "כסלו", type: "birthday" },
       { name: "רבקה", family: "הרפז", day: 3, month: "כסלו", type: "birthday", relation: "בת" },
       { name: "לוי יצחק", family: "הרפז", day: 1, month: "תמוז", type: "birthday", relation: "בן" },
       { name: "חיה מושקא", family: "הרפז", day: 22, month: "אדר", type: "birthday", relation: "בת" },
@@ -428,8 +428,8 @@
       { name: "משפחת הרפז", family: "הרפז", day: 21, month: "אלול", type: "anniversary" },
 
       // משפחת גלעדי - הורים, ילדים ויום נישואין
-      { name: "ינון שלום", family: "גלעדי", day: 21, month: "שבט", type: "birthday", relation: "בן" },
-      { name: "חנה", family: "גלעדי", day: 11, month: "אב", type: "birthday", relation: "בת" },
+      { name: "ינון שלום", family: "גלעדי", day: 21, month: "שבט", type: "birthday" },
+      { name: "חנה", family: "גלעדי", day: 11, month: "אב", type: "birthday" },
       { name: "רחל מושקא", family: "גלעדי", day: 26, month: "תשרי", type: "birthday", relation: "בת" },
       { name: "אביטל הודיה", family: "גלעדי", day: 9, month: "שבט", type: "birthday", relation: "בת" },
       { name: "הלל אמונה", family: "גלעדי", day: 2, month: "אדר", type: "birthday", relation: "בת" },
@@ -440,8 +440,8 @@
       { name: "משפחת גלעדי", family: "גלעדי", day: 5, month: "סיון", type: "anniversary" },
 
       // משפחת כץ - הורים, ילדים ויום נישואין
-      { name: "שלמה אליעזר", family: "כץ", day: 19, month: "שבט", type: "birthday", relation: "בן" },
-      { name: "חוה הינדה", family: "כץ", day: 22, month: "סיון", type: "birthday", relation: "בת" },
+      { name: "שלמה אליעזר", family: "כץ", day: 19, month: "שבט", type: "birthday" },
+      { name: "חוה הינדה", family: "כץ", day: 22, month: "סיון", type: "birthday" },
       { name: "העטי לאה", family: "כץ", day: 12, month: "חשוון", type: "birthday", relation: "בת" },
       { name: "לוי יצחק", family: "כץ", day: 26, month: "אדר ב", type: "birthday", relation: "בן" },
       { name: "רבקה", family: "כץ", day: 10, month: "אב", type: "birthday", relation: "בת" },
@@ -449,15 +449,15 @@
       { name: "משפחת כץ", family: "כץ", day: 12, month: "שבט", type: "anniversary" },
 
       // משפחת הרשקוביץ - הורים וילדים
-      { name: "חיה מושקא", family: "הרשקוביץ", day: 3, month: "אדר", type: "birthday", relation: "בת" },
-      { name: "צביקה", family: "הרשקוביץ", day: 25, month: "כסלו", type: "birthday", relation: "בעלה של", relatedName: "חיה מושקא" },
+      { name: "חיה מושקא", family: "הרשקוביץ", day: 3, month: "אדר", type: "birthday" },
+      { name: "צביקה", family: "הרשקוביץ", day: 25, month: "כסלו", type: "birthday" },
       { name: "ליאור מרדכי", family: "הרשקוביץ", day: 20, month: "טבת", type: "birthday", relation: "בן" },
       { name: "לילי", family: "הרשקוביץ", day: 16, month: "תמוז", type: "birthday", relation: "בת" },
       { name: "דבורה", family: "הרשקוביץ", day: 11, month: "חשוון", type: "birthday", relation: "בת" },
 
       // משפחת הרפז - משפחה נוספת
-      { name: "יוסף יצחק", family: "הרפז - משפחה נוספת", day: 19, month: "תמוז", type: "birthday", relation: "בן" },
-      { name: "רבקה רחל", family: "הרפז - משפחה נוספת", day: 7, month: "כסלו", type: "birthday", relation: "כלתו של", relatedName: "יוסף יצחק הרפז" },
+      { name: "יוסף יצחק", family: "הרפז - משפחה נוספת", day: 19, month: "תמוז", type: "birthday" },
+      { name: "רבקה רחל", family: "הרפז - משפחה נוספת", day: 7, month: "כסלו", type: "birthday" },
       { name: "חיה מושקא", family: "הרפז - משפחה נוספת", day: 22, month: "אייר", type: "birthday", relation: "בת" },
       { name: "חנה", family: "הרפז - משפחה נוספת", day: 9, month: "חשוון", type: "birthday", relation: "בת" },
       { name: "שניאור זלמן", family: "הרפז - משפחה נוספת", day: 24, month: "כסלו", type: "birthday", relation: "בן" },
@@ -468,8 +468,8 @@
       { name: "משפחת הרפז", family: "הרפז - משפחה נוספת", day: 20, month: "חשוון", type: "anniversary" },
 
       // משפחת מריאין
-      { name: "מרדכי", family: "מריאין", day: 24, month: "תמוז", type: "birthday", relation: "בן" },
-      { name: "ברכה נחמה", family: "מריאין", day: 7, month: "טבת", type: "birthday", relation: "בת" },
+      { name: "מרדכי", family: "מריאין", day: 24, month: "תמוז", type: "birthday" },
+      { name: "ברכה נחמה", family: "מריאין", day: 7, month: "טבת", type: "birthday" },
       { name: "מנחם מענדל", family: "מריאין", day: 20, month: "ניסן", type: "birthday", relation: "בן" },
       { name: "חיה מושקא", family: "מריאין", day: 27, month: "אייר", type: "birthday", relation: "בת" },
       { name: "אמונה רבקה", family: "מריאין", day: 11, month: "שבט", type: "birthday", relation: "בת" },
@@ -478,8 +478,8 @@
       { name: "משפחת מריאין", family: "מריאין", day: 1, month: "תמוז", type: "anniversary" },
 
       // משפחת אברמוב
-      { name: "דוד", family: "אברמוב", day: 28, month: "כסלו", type: "birthday", relation: "בן" },
-      { name: "יהודית", family: "אברמוב", day: 1, month: "תשרי", type: "birthday", relation: "בת" },
+      { name: "דוד", family: "אברמוב", day: 28, month: "כסלו", type: "birthday" },
+      { name: "יהודית", family: "אברמוב", day: 1, month: "תשרי", type: "birthday" },
       { name: "חנה", family: "אברמוב", day: 26, month: "שבט", type: "birthday", relation: "בת" },
       { name: "חיה מושקא", family: "אברמוב", day: 5, month: "אלול", type: "birthday", relation: "בת" },
       { name: "יעקב אורי", family: "אברמוב", day: 20, month: "תשרי", type: "birthday", relation: "בן" },
@@ -489,7 +489,7 @@
       { name: "משפחת אברמוב", family: "אברמוב", day: 2, month: "שבט", type: "anniversary" },
 
       // משפחת וייסגלס
-      { name: "פייגא רות", family: "וייסגלס", day: 21, month: "סיון", type: "birthday", relation: "בת" },
+      { name: "פייגא רות", family: "וייסגלס", day: 21, month: "סיון", type: "birthday" },
 
       // שמות נוספים שהופיעו בנפרד בטקסט
       { name: "רבקה", family: "הרפז - רשומה נוספת", day: 12, month: "שבט", type: "birthday", relation: "בת" },
@@ -497,21 +497,21 @@
       { name: "חיים מרדכי", family: "הרפז - רשומה נוספת", day: 2, month: "חשוון", type: "birthday", relation: "בן" },
 
       // משפחת שוורץ
-      { name: "רחל מושקא", family: "שוורץ", day: 26, month: "תשרי", type: "birthday", relation: "בת" },
-      { name: "לירון ליפא אברהם", family: "שוורץ", day: 28, month: "כסלו", type: "birthday", relation: "בן" },
+      { name: "רחל מושקא", family: "שוורץ", day: 26, month: "תשרי", type: "birthday" },
+      { name: "לירון ליפא אברהם", family: "שוורץ", day: 28, month: "כסלו", type: "birthday" },
       { name: "דבורה לאה", family: "שוורץ", day: 1, month: "אדר", type: "birthday", relation: "בת" },
       { name: "שיינא", family: "שוורץ", day: 9, month: "סיון", type: "birthday", relation: "בת" },
       { name: "משפחת שוורץ", family: "שוורץ", day: 24, month: "שבט", type: "anniversary" },
 
       // משפחת הענדל
-      { name: "העטי לאה", family: "הענדל", day: 12, month: "חשוון", type: "birthday", relation: "בת" },
-      { name: "שלום דוב בער הענדל", family: "הענדל", day: 4, month: "אב", type: "birthday", relation: "בן" },
+      { name: "העטי לאה", family: "הענדל", day: 12, month: "חשוון", type: "birthday" },
+      { name: "שלום דוב בער הענדל", family: "הענדל", day: 4, month: "אב", type: "birthday" },
       { name: "מושקא", family: "הענדל", day: 29, month: "תמוז", type: "birthday", relation: "בת" },
       { name: "משפחת הענדל", family: "הענדל", day: 16, month: "סיון", type: "anniversary" },
 
       // משפחת פרוכטר
-      { name: "אביטל הודיה", family: "פרוכטר", day: 9, month: "שבט", type: "birthday", relation: "בת" },
-      { name: "זכריה דוד (זק)", family: "פרוכטר", day: 16, month: "חשוון", type: "birthday", relation: "בן" },
+      { name: "אביטל הודיה", family: "פרוכטר", day: 9, month: "שבט", type: "birthday" },
+      { name: "זכריה דוד (זק)", family: "פרוכטר", day: 16, month: "חשוון", type: "birthday" },
       { name: "משפחת פרוכטר", family: "פרוכטר", day: 15, month: "סיון", type: "anniversary" }
     ];
 
