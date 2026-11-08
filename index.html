@@ -286,7 +286,7 @@
     .notification-info small { color: var(--muted); font-size: 12px; }
 
     /* בחירת מועד ההתראה וכפתור ההפעלה */
-    .notifications select, .notifications button {
+    .notifications select, .notifications input, .notifications button {
       min-height: 42px;
       padding: 8px 12px;
       border: 1px solid #cbd5e1;
@@ -388,7 +388,7 @@
         <strong>🔔 תזכורות על אירועים</strong>
         <small>תזכורות אוטומטיות דרך Cloudflare, גם כשהאתר סגור</small>
       </div>
-      <label style="flex: 0 1 180px;">
+      <label style="flex: 1 1 150px;">
         מתי להזכיר?
         <select id="reminderDays">
           <option value="0">ביום האירוע</option>
@@ -397,7 +397,12 @@
           <option value="7">שבוע לפני</option>
         </select>
       </label>
+      <label style="flex: 1 1 150px;">
+        באיזו שעה לקבל התראה?
+        <input type="time" id="reminderTime" value="08:00" step="3600">
+      </label>
       <button type="button" id="enableNotifications">הפעלת התראות</button>
+      <button type="button" id="testNotification">שליחת התראת בדיקה עכשיו</button>
       <span id="notificationStatus" role="status">ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.</span>
     </section>
 
@@ -1581,14 +1586,19 @@
 
     // הגדרות החיבור לשירות ההתראות של Cloudflare
     const reminderDaysSelect = document.getElementById("reminderDays");
+    const reminderTimeInput = document.getElementById("reminderTime");
     const notificationButton = document.getElementById("enableNotifications");
+    const testNotificationButton = document.getElementById("testNotification");
     const notificationStatus = document.getElementById("notificationStatus");
     const notificationPreferenceKey = "familyEventsNotificationsEnabled";
     const reminderPreferenceKey = "familyEventsReminderDays";
+    const reminderTimePreferenceKey = "familyEventsReminderTime";
     const pushApi = "https://family-push.go5.workers.dev";
 
-    // טוענים את מספר הימים שנבחר בעבר
+    // טוענים את מספר הימים ואת שעת ההתראה שנבחרו בעבר
     reminderDaysSelect.value = localStorage.getItem(reminderPreferenceKey) || "3";
+    const savedReminderTime = localStorage.getItem(reminderTimePreferenceKey) || "08:00";
+    reminderTimeInput.value = /^([01]\\d|2[0-3]):00$/.test(savedReminderTime) ? savedReminderTime : "08:00";
 
     // ממירים מפתח ציבורי בפורמט Base64URL למערך בתים שהדפדפן דורש
     function urlBase64ToUint8Array(base64String) {
@@ -1639,7 +1649,8 @@
     async function savePushSubscription(subscription) {
       await pushApiRequest("/subscribe", {
         subscription: subscription.toJSON(),
-        days: [Number(reminderDaysSelect.value)]
+        days: [Number(reminderDaysSelect.value)],
+        time: reminderTimeInput.value
       });
     }
 
@@ -1672,7 +1683,7 @@
           const registration = await navigator.serviceWorker.getRegistration(new URL("./", location.href).href);
           const subscription = registration && await registration.pushManager.getSubscription();
           if (subscription) {
-            notificationStatus.textContent = "ההתראות פעילות גם כשהאתר סגור. התזכורת תישלח " + reminderDaysSelect.options[reminderDaysSelect.selectedIndex].text + ".";
+            notificationStatus.textContent = "ההתראות פעילות גם כשהאתר סגור. התזכורת תישלח " + reminderDaysSelect.options[reminderDaysSelect.selectedIndex].text + " בשעה " + reminderTimeInput.value + " (שעון ישראל).";
             notificationButton.textContent = "כיבוי התראות";
             return;
           }
@@ -1687,20 +1698,43 @@
       notificationButton.textContent = "הפעלת התראות";
     }
 
-    // מעדכנים את מועד התזכורת בשרת כאשר המשתמש משנה את הבחירה
-    reminderDaysSelect.addEventListener("change", async () => {
+    // מעדכנים את מספר הימים ואת שעת ההתראה בשרת כאשר המשתמש משנה בחירה
+    async function updateReminderPreferences() {
       localStorage.setItem(reminderPreferenceKey, reminderDaysSelect.value);
+      localStorage.setItem(reminderTimePreferenceKey, reminderTimeInput.value);
       if (localStorage.getItem(notificationPreferenceKey) === "true") {
         try {
           const registration = await getPushRegistration();
           const subscription = await registration.pushManager.getSubscription();
           if (subscription) await savePushSubscription(subscription);
-          notificationStatus.textContent = "בחירת מועד התזכורת עודכנה.";
+          notificationStatus.textContent = "הגדרות ההתראה עודכנו: " + reminderDaysSelect.options[reminderDaysSelect.selectedIndex].text + " בשעה " + reminderTimeInput.value + ".";
         } catch (error) {
-          notificationStatus.textContent = "לא הצלחנו לעדכן את מועד התזכורת: " + error.message;
+          notificationStatus.textContent = "לא הצלחנו לעדכן את הגדרות ההתראה: " + error.message;
         }
       }
       await updateNotificationStatus();
+    }
+    reminderDaysSelect.addEventListener("change", updateReminderPreferences);
+    reminderTimeInput.addEventListener("change", updateReminderPreferences);
+
+    // שולחים התראת בדיקה למכשיר הנוכחי בלי להמתין לאירוע
+    testNotificationButton.addEventListener("click", async () => {
+      testNotificationButton.disabled = true;
+      notificationStatus.textContent = "שולחים התראת בדיקה...";
+      try {
+        if (!("Notification" in window) || Notification.permission !== "granted") {
+          throw new Error("יש להפעיל תחילה את ההתראות ולאשר הרשאה בדפדפן.");
+        }
+        const registration = await getPushRegistration();
+        const subscription = await registration.pushManager.getSubscription();
+        if (!subscription) throw new Error("לא נמצאה הרשמת התראות פעילה. יש להפעיל התראות תחילה.");
+        await pushApiRequest("/test", { endpoint: subscription.endpoint });
+        notificationStatus.textContent = "התראת הבדיקה נשלחה לשירות Push. בדוק את ההתראות בטלפון.";
+      } catch (error) {
+        notificationStatus.textContent = "שליחת הבדיקה נכשלה: " + error.message;
+      } finally {
+        testNotificationButton.disabled = false;
+      }
     });
 
     // מפעילים או מכבים הרשמה לקבלת התראות Push
