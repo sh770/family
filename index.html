@@ -1432,11 +1432,11 @@
       dates.className = "dates";
       content.appendChild(dates);
 
-      // הצגת התאריך הלועזי שבו יחגוג את הגיל הבא, כולל ציון בר או בת מצווה
+      // הצגת התאריך העברי שבו יחגוג את הגיל הבא, כולל ציון בר או בת מצווה
       if (celebrationAge !== null) {
         const celebration = document.createElement("span");
         const genderVerb = event.relation === "בת" || event.relation === "אשתו של" ? "תחגוג" : "יחגוג";
-        celebration.textContent = "🎉 בתאריך " + gregorianDateFormatter.format(date) + " " + genderVerb + " יום הולדת לגיל " + celebrationAge + (milestoneLabel ? " – " + milestoneLabel + "!" : "");
+        celebration.textContent = "🎉 בתאריך " + formatHebrewDate(date) + " " + genderVerb + " יום הולדת לגיל " + celebrationAge + (milestoneLabel ? " – " + milestoneLabel + "!" : "");
         dates.appendChild(celebration);
       }
 
