@@ -402,7 +402,7 @@
         <input type="time" id="reminderTime" value="08:00" step="3600">
       </label>
       <button type="button" id="enableNotifications">הפעלת התראות</button>
-      <button type="button" id="testNotification">שליחת התראת בדיקה עכשיו</button>
+      <button type="button" id="testNotification">בדיקת התראה בעוד כשתי דקות</button>
       <span id="notificationStatus" role="status">ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.</span>
     </section>
 
@@ -1729,7 +1729,7 @@
         const subscription = await registration.pushManager.getSubscription();
         if (!subscription) throw new Error("לא נמצאה הרשמת התראות פעילה. יש להפעיל התראות תחילה.");
         await pushApiRequest("/test", { endpoint: subscription.endpoint });
-        notificationStatus.textContent = "התראת הבדיקה נשלחה לשירות Push. בדוק את ההתראות בטלפון.";
+        notificationStatus.textContent = "הבדיקה נקבעה! סגור עכשיו את האתר. התראה תישלח בעוד כשתי דקות, גם כשהאתר סגור.";
       } catch (error) {
         notificationStatus.textContent = "שליחת הבדיקה נכשלה: " + error.message;
       } finally {
