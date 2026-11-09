@@ -42,6 +42,7 @@
 ```text
 family/
 ├── index.html
+├── sw.js
 ├── README.md
 └── .github/
     └── workflows/
@@ -49,6 +50,7 @@ family/
 ```
 
 - `index.html` – קובץ האתר הראשי, הכולל את המבנה, העיצוב והקוד.
+- `sw.js` – שירות עובד מקומי להצגת התראות דפדפן בלבד, ללא קבלת הודעות Push.
 - `README.md` – מסמך זה.
 - `.github/workflows/pages.yml` – תהליך אוטומטי לפרסום האתר באמצעות GitHub Pages.
 
