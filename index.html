@@ -1628,7 +1628,7 @@
       return registration;
     }
 
-    // מסירים הרשמת Push ישנה מהמכשיר בלי לפנות לשרת Cloudflare
+    // מסירים הרשמת התראות מרוחקות ישנה מהמכשיר בלי לפנות לשרת חיצוני
     async function removeLegacyPushSubscription(registration) {
       try {
         const subscription = await registration.pushManager.getSubscription();
@@ -1810,14 +1810,12 @@
 
     // מאתחלים התראות מקומיות ושומרים על בדיקה בזמן שהאתר פתוח
     async function initializeLocalNotifications() {
-      if (localStorage.getItem(notificationPreferenceKey) === "true" &&
-          "Notification" in window && Notification.permission === "granted") {
-        try {
-          const registration = await getLocalNotificationRegistration();
-          if (registration) await removeLegacyPushSubscription(registration);
-        } catch (error) {
-          notificationStatus.textContent = "לא ניתן להפעיל את שירות ההתראות המקומי: " + error.message;
-        }
+      try {
+        // מנקים הרשמת Push ישנה בכל ביקור באתר, גם אם ההתראות המקומיות כבויות
+        const registration = await getLocalNotificationRegistration();
+        if (registration) await removeLegacyPushSubscription(registration);
+      } catch (error) {
+        // ממשיכים להציג את האתר גם אם הדפדפן אינו מאפשר רישום שירות מקומי
       }
       await updateNotificationStatus();
       await checkUpcomingNotifications();
