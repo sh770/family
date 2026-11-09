@@ -386,8 +386,16 @@
     <section class="notifications" aria-label="הגדרות התראות">
       <div class="notification-info">
         <strong>🔔 תזכורות על אירועים</strong>
-        <small>תזכורות אוטומטיות דרך Cloudflare, גם כשהאתר סגור</small>
+        <small>התראות דפדפן מקומיות בלבד. האתר חייב להישאר פתוח כדי לשלוח אותן.</small>
       </div>
+      <label style="flex: 1 1 150px;">
+        אילו אירועים להזכיר?
+        <select id="reminderKind">
+          <option value="all">ימי הולדת וימי נישואין</option>
+          <option value="birthday">ימי הולדת בלבד</option>
+          <option value="anniversary">ימי נישואין בלבד</option>
+        </select>
+      </label>
       <label style="flex: 1 1 150px;">
         מתי להזכיר?
         <select id="reminderDays">
@@ -399,10 +407,10 @@
       </label>
       <label style="flex: 1 1 150px;">
         באיזו שעה לקבל התראה?
-        <input type="time" id="reminderTime" value="08:00" step="3600">
+        <input type="time" id="reminderTime" value="08:00" step="60">
       </label>
       <button type="button" id="enableNotifications">הפעלת התראות</button>
-      <button type="button" id="testNotification">בדיקת התראה בעוד כשתי דקות</button>
+      <button type="button" id="testNotification">שליחת התראת בדיקה</button>
       <span id="notificationStatus" role="status">ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.</span>
     </section>
 
@@ -413,7 +421,7 @@
     <section id="events" aria-live="polite"></section>
     <p class="note">
       החישוב מתבצע בדפדפן לפי הלוח העברי המובנה. אירועים ללא שנת לידה או נישואין מחושבים לפי היום והחודש בלבד.
-      התאריך הלועזי מציין את היום שבו חל התאריך העברי, החל מהיום. התזכורות נשלחות באמצעות שירות Push, בהתאם למספר הימים שנבחר ובהרשאת הדפדפן.
+      התאריך הלועזי מציין את היום שבו חל התאריך העברי, החל מהיום. התראות מקומיות נשלחות רק כאשר האתר פתוח בדפדפן ובהרשאת המשתמש.
     </p>
   </main>
 
@@ -1584,79 +1592,81 @@
       applyTheme(nextTheme);
     });
 
-    // הגדרות החיבור לשירות ההתראות של Cloudflare
+    // הגדרות ההתראות המקומיות ושמות המפתחות לשמירה במכשיר
     const reminderDaysSelect = document.getElementById("reminderDays");
     const reminderTimeInput = document.getElementById("reminderTime");
+    const reminderKindSelect = document.getElementById("reminderKind");
     const notificationButton = document.getElementById("enableNotifications");
     const testNotificationButton = document.getElementById("testNotification");
     const notificationStatus = document.getElementById("notificationStatus");
     const notificationPreferenceKey = "familyEventsNotificationsEnabled";
     const reminderPreferenceKey = "familyEventsReminderDays";
     const reminderTimePreferenceKey = "familyEventsReminderTime";
-    const pushApi = "https://family-push.go5.workers.dev";
+    const reminderKindPreferenceKey = "familyEventsReminderKind";
+    const sentNotificationsKey = "familyEventsSentLocalNotifications";
 
-    // טוענים את מספר הימים ואת שעת ההתראה שנבחרו בעבר
+    // משחזרים את בחירות המשתמש שנשמרו במכשיר
     reminderDaysSelect.value = localStorage.getItem(reminderPreferenceKey) || "3";
-    const savedReminderTime = localStorage.getItem(reminderTimePreferenceKey) || "08:00";
-    reminderTimeInput.value = /^([01]\\d|2[0-3]):00$/.test(savedReminderTime) ? savedReminderTime : "08:00";
+    reminderTimeInput.value = localStorage.getItem(reminderTimePreferenceKey) || "08:00";
+    reminderKindSelect.value = localStorage.getItem(reminderKindPreferenceKey) || "all";
 
-    // ממירים מפתח ציבורי בפורמט Base64URL למערך בתים שהדפדפן דורש
-    function urlBase64ToUint8Array(base64String) {
-      const padding = "=".repeat((4 - base64String.length % 4) % 4);
-      const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-      const rawData = atob(base64);
-      return Uint8Array.from(rawData, character => character.charCodeAt(0));
+    // שומרים את כל העדפות ההתראות במכשיר בלבד
+    function saveNotificationPreferences() {
+      localStorage.setItem(reminderPreferenceKey, reminderDaysSelect.value);
+      localStorage.setItem(reminderTimePreferenceKey, reminderTimeInput.value);
+      localStorage.setItem(reminderKindPreferenceKey, reminderKindSelect.value);
     }
 
-    // שולחים בקשת JSON לשירות ההתראות ומציגים שגיאה אם השרת דוחה אותה
-    async function pushApiRequest(path, payload) {
-      const response = await fetch(pushApi + path, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(result.error || result.message || "שגיאת שרת (" + response.status + ")");
-      }
-      return result;
-    }
-
-    // רושמים את קובץ שירות הרקע בתיקיית האתר
-    async function getPushRegistration() {
-      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-        throw new Error("הדפדפן אינו תומך בהתראות Push.");
-      }
-      return navigator.serviceWorker.register("./sw.js", {
+    // רושמים Service Worker מקומי בלבד, לצורך הצגת התראות גם בדפדפני Android
+    async function getLocalNotificationRegistration() {
+      if (!("serviceWorker" in navigator)) return null;
+      const registration = await navigator.serviceWorker.register("./sw.js", {
         scope: "./",
         updateViaCache: "none"
       });
+      await navigator.serviceWorker.ready;
+      return registration;
     }
 
-    // קוראים את המפתח הציבורי מהשרת ותומכים בכמה שמות שדה אפשריים
-    async function getVapidPublicKey() {
-      const response = await fetch(pushApi + "/vapidPublicKey");
-      if (!response.ok) throw new Error("לא ניתן לקבל מפתח התראות מהשרת.");
-      const result = await response.json();
-      const key = typeof result === "string"
-        ? result
-        : result.publicKey || result.vapidPublicKey || result.key;
-      if (!key) throw new Error("השרת לא החזיר מפתח ציבורי תקין.");
-      return key;
+    // מסירים הרשמת Push ישנה מהמכשיר בלי לפנות לשרת Cloudflare
+    async function removeLegacyPushSubscription(registration) {
+      try {
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) await subscription.unsubscribe();
+      } catch (error) {
+        // כשל בניקוי הרשמה ישנה אינו מונע שימוש בהתראות המקומיות
+      }
     }
 
-    // יוצרים או מעדכנים הרשמה לקבלת התראות בשרת
-    async function savePushSubscription(subscription) {
-      await pushApiRequest("/subscribe", {
-        subscription: subscription.toJSON(),
-        days: [Number(reminderDaysSelect.value)],
-        time: reminderTimeInput.value
-      });
+    // מציגים התראה מקומית דרך Service Worker או דרך ממשק ההתראות הרגיל
+    async function showLocalNotification(title, body, tag) {
+      if (!("Notification" in window) || Notification.permission !== "granted") {
+        throw new Error("יש לאשר תחילה התראות בהגדרות הדפדפן.");
+      }
+
+      if ("serviceWorker" in navigator) {
+        const registration = await getLocalNotificationRegistration();
+        if (registration && "showNotification" in registration) {
+          await registration.showNotification(title, {
+            body,
+            tag: tag || "family-event",
+            dir: "rtl",
+            lang: "he",
+            renotify: false
+          });
+          return;
+        }
+      }
+
+      // חלופה לדפדפנים שולחניים שאינם מציגים התראה דרך Service Worker
+      new Notification(title, { body, tag: tag || "family-event", lang: "he" });
     }
 
-    // מציגים למשתמש את מצב התמיכה וההרשמה בפועל
+    // מעדכנים את הטקסט והכפתור בהתאם לתמיכת הדפדפן ולהרשאה
     async function updateNotificationStatus() {
+      const enabled = localStorage.getItem(notificationPreferenceKey) === "true";
       notificationButton.disabled = false;
+
       if (!("Notification" in window)) {
         notificationStatus.textContent = "הדפדפן הזה אינו תומך בהתראות.";
         notificationButton.disabled = true;
@@ -1667,98 +1677,112 @@
         notificationButton.disabled = true;
         return;
       }
-      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-        notificationStatus.textContent = "הדפדפן אינו תומך בהתראות Push.";
-        notificationButton.disabled = true;
-        return;
-      }
       if (Notification.permission === "denied") {
         notificationStatus.textContent = "ההתראות נחסמו. יש לאפשר אותן בהגדרות האתר בדפדפן.";
         notificationButton.textContent = "בדיקת הרשאת התראות";
         return;
       }
-      const enabled = localStorage.getItem(notificationPreferenceKey) === "true";
+
       if (enabled && Notification.permission === "granted") {
-        try {
-          const registration = await navigator.serviceWorker.getRegistration(new URL("./", location.href).href);
-          const subscription = registration && await registration.pushManager.getSubscription();
-          if (subscription) {
-            notificationStatus.textContent = "ההתראות פעילות גם כשהאתר סגור. התזכורת תישלח " + reminderDaysSelect.options[reminderDaysSelect.selectedIndex].text + " בשעה " + reminderTimeInput.value + " (שעון ישראל).";
-            notificationButton.textContent = "כיבוי התראות";
-            return;
-          }
-        } catch (error) {
-          // במקרה של כשל בבדיקת ההרשמה מציגים מצב שמאפשר ניסיון חוזר
-        }
-        notificationStatus.textContent = "נדרשת התחברות מחדש לשירות ההתראות.";
-        notificationButton.textContent = "חיבור מחדש להתראות";
+        notificationStatus.textContent = "ההתראות המקומיות פעילות כל עוד האתר פתוח. תזכורת " +
+          reminderDaysSelect.options[reminderDaysSelect.selectedIndex].text +
+          " בשעה " + reminderTimeInput.value + ".";
+        notificationButton.textContent = "כיבוי התראות";
         return;
       }
+
       notificationStatus.textContent = "ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.";
       notificationButton.textContent = "הפעלת התראות";
     }
 
-    // מעדכנים את מספר הימים ואת שעת ההתראה בשרת כאשר המשתמש משנה בחירה
-    async function updateReminderPreferences() {
-      localStorage.setItem(reminderPreferenceKey, reminderDaysSelect.value);
-      localStorage.setItem(reminderTimePreferenceKey, reminderTimeInput.value);
-      if (localStorage.getItem(notificationPreferenceKey) === "true") {
+    // בודקים אם הגיע מועד תזכורת ושולחים כל אירוע פעם אחת בלבד
+    async function checkUpcomingNotifications() {
+      if (localStorage.getItem(notificationPreferenceKey) !== "true") return;
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+
+      const now = new Date();
+      const [targetHour, targetMinute] = reminderTimeInput.value.split(":").map(Number);
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const targetMinutes = targetHour * 60 + targetMinute;
+
+      // ממתינים לשעה שנבחרה, אך מאפשרים שליחה אם האתר נפתח מאוחר יותר באותו יום
+      if (currentMinutes < targetMinutes) return;
+
+      const reminderDays = Number(reminderDaysSelect.value);
+      const selectedKind = reminderKindSelect.value;
+      const dueEvents = getCalculatedEvents().filter(event =>
+        event.daysLeft === reminderDays &&
+        (selectedKind === "all" || event.type === selectedKind)
+      );
+
+      // טוענים את מזהי ההתראות שכבר נשלחו כדי למנוע כפילויות
+      let sentKeys = [];
+      try {
+        sentKeys = JSON.parse(localStorage.getItem(sentNotificationsKey) || "[]");
+        if (!Array.isArray(sentKeys)) sentKeys = [];
+      } catch (error) {
+        sentKeys = [];
+      }
+
+      for (const event of dueEvents) {
+        const eventDateKey = event.date.getFullYear() + "-" +
+          String(event.date.getMonth() + 1).padStart(2, "0") + "-" +
+          String(event.date.getDate()).padStart(2, "0");
+        const eventKey = [event.type, event.family, event.name, eventDateKey].join("|");
+        if (sentKeys.includes(eventKey)) continue;
+
+        const title = event.type === "birthday"
+          ? "🎂 תזכורת ליום הולדת"
+          : "💍 תזכורת ליום נישואין";
+        const body = event.type === "birthday"
+          ? event.name + " – " + event.family
+          : (getAnniversaryCoupleLabel(event.family) || event.family);
+
+        // מסמנים את האירוע לפני השליחה כדי למנוע שליחה כפולה במקרה של רענון
+        sentKeys.push(eventKey);
+        localStorage.setItem(sentNotificationsKey, JSON.stringify(sentKeys.slice(-300)));
+
         try {
-          const registration = await getPushRegistration();
-          const subscription = await registration.pushManager.getSubscription();
-          if (subscription) await savePushSubscription(subscription);
-          notificationStatus.textContent = "הגדרות ההתראה עודכנו: " + reminderDaysSelect.options[reminderDaysSelect.selectedIndex].text + " בשעה " + reminderTimeInput.value + ".";
+          await showLocalNotification(title, body, eventKey);
         } catch (error) {
-          notificationStatus.textContent = "לא הצלחנו לעדכן את הגדרות ההתראה: " + error.message;
+          notificationStatus.textContent = "לא הצלחנו להציג התראה: " + error.message;
         }
       }
-      await updateNotificationStatus();
+    }
+
+    // שומרים כל שינוי בהגדרות ומריצים בדיקה מחדש
+    function updateReminderPreferences() {
+      saveNotificationPreferences();
+      notificationStatus.textContent = "ההעדפות נשמרו במכשיר.";
+      checkUpcomingNotifications();
+      updateNotificationStatus();
     }
     reminderDaysSelect.addEventListener("change", updateReminderPreferences);
     reminderTimeInput.addEventListener("change", updateReminderPreferences);
+    reminderKindSelect.addEventListener("change", updateReminderPreferences);
 
-    // שולחים התראת בדיקה למכשיר הנוכחי בלי להמתין לאירוע
+    // שולחים התראת בדיקה מיידית כדי לוודא שהדפדפן מציג התראות
     testNotificationButton.addEventListener("click", async () => {
       testNotificationButton.disabled = true;
-      notificationStatus.textContent = "שולחים התראת בדיקה...";
       try {
-        if (!("Notification" in window) || Notification.permission !== "granted") {
-          throw new Error("יש להפעיל תחילה את ההתראות ולאשר הרשאה בדפדפן.");
-        }
-        const registration = await getPushRegistration();
-        const subscription = await registration.pushManager.getSubscription();
-        if (!subscription) throw new Error("לא נמצאה הרשמת התראות פעילה. יש להפעיל התראות תחילה.");
-        await pushApiRequest("/test", { endpoint: subscription.endpoint });
-        notificationStatus.textContent = "הבדיקה נקבעה! סגור עכשיו את האתר. התראה תישלח בעוד כשתי דקות, גם כשהאתר סגור.";
+        await showLocalNotification("🔔 בדיקת התראות", "ההתראות המקומיות פועלות במכשיר הזה.", "family-test");
+        notificationStatus.textContent = "התראת הבדיקה נשלחה.";
       } catch (error) {
-        notificationStatus.textContent = "שליחת הבדיקה נכשלה: " + error.message;
+        notificationStatus.textContent = "בדיקת ההתראה נכשלה: " + error.message;
       } finally {
         testNotificationButton.disabled = false;
       }
     });
 
-    // מפעילים או מכבים הרשמה לקבלת התראות Push
+    // מפעילים או מכבים התראות מקומיות לפי בחירת המשתמש
     notificationButton.addEventListener("click", async () => {
-      if (!("Notification" in window) || !window.isSecureContext) {
-        await updateNotificationStatus();
-        return;
-      }
       notificationButton.disabled = true;
-      notificationStatus.textContent = "מתחברים לשירות ההתראות...";
-
       try {
-        // אם קיימת הרשמה פעילה, מסירים אותה גם מהשרת וגם מהדפדפן
         if (localStorage.getItem(notificationPreferenceKey) === "true") {
-          const registration = await getPushRegistration();
-          const subscription = await registration.pushManager.getSubscription();
-          if (subscription) {
-            await pushApiRequest("/unsubscribe", { endpoint: subscription.endpoint });
-            await subscription.unsubscribe();
-          }
           localStorage.setItem(notificationPreferenceKey, "false");
           notificationStatus.textContent = "ההתראות כובו.";
         } else {
-          // מבקשים הרשאה רק בעקבות לחיצה מפורשת של המשתמש
+          // בקשת ההרשאה נעשית רק בעקבות לחיצה מפורשת של המשתמש
           const permission = await Notification.requestPermission();
           if (permission !== "granted") {
             notificationStatus.textContent = permission === "denied"
@@ -1767,51 +1791,45 @@
             return;
           }
 
-          // רושמים את שירות הרקע ומקבלים את המפתח הציבורי מהשרת
-          const registration = await getPushRegistration();
-          const publicKey = await getVapidPublicKey();
-          let subscription = await registration.pushManager.getSubscription();
+          // רישום שירות מקומי וניקוי הרשמת Push ישנה, ללא פנייה לשרת
+          const registration = await getLocalNotificationRegistration();
+          if (registration) await removeLegacyPushSubscription(registration);
 
-          // יוצרים הרשמת Push חדשה אם אין הרשמה קודמת
-          if (!subscription) {
-            subscription = await registration.pushManager.subscribe({
-              userVisibleOnly: true,
-              applicationServerKey: urlBase64ToUint8Array(publicKey)
-            });
-          }
-
-          // שומרים את ההרשמה ואת מספר הימים בשרת Cloudflare
-          await savePushSubscription(subscription);
+          saveNotificationPreferences();
           localStorage.setItem(notificationPreferenceKey, "true");
-          localStorage.setItem(reminderPreferenceKey, reminderDaysSelect.value);
-          notificationStatus.textContent = "ההרשמה להתראות נשמרה בהצלחה.";
+          notificationStatus.textContent = "ההתראות הופעלו במכשיר הזה.";
         }
       } catch (error) {
         notificationStatus.textContent = "הפעולה נכשלה: " + error.message;
       } finally {
         notificationButton.disabled = false;
         await updateNotificationStatus();
+        checkUpcomingNotifications();
       }
     });
 
-    // משחזרים את מצב ההרשמה הקיימת ומעדכנים אותה מול השרת
-    async function initializePushNotifications() {
-      if (!( "Notification" in window) || localStorage.getItem(notificationPreferenceKey) !== "true" || Notification.permission !== "granted") {
-        await updateNotificationStatus();
-        return;
-      }
-      try {
-        const registration = await getPushRegistration();
-        const subscription = await registration.pushManager.getSubscription();
-        if (subscription) await savePushSubscription(subscription);
-      } catch (error) {
-        notificationStatus.textContent = "לא הצלחנו לאמת את ההרשמה: " + error.message;
+    // מאתחלים התראות מקומיות ושומרים על בדיקה בזמן שהאתר פתוח
+    async function initializeLocalNotifications() {
+      if (localStorage.getItem(notificationPreferenceKey) === "true" &&
+          "Notification" in window && Notification.permission === "granted") {
+        try {
+          const registration = await getLocalNotificationRegistration();
+          if (registration) await removeLegacyPushSubscription(registration);
+        } catch (error) {
+          notificationStatus.textContent = "לא ניתן להפעיל את שירות ההתראות המקומי: " + error.message;
+        }
       }
       await updateNotificationStatus();
+      await checkUpcomingNotifications();
     }
 
-    // מפעילים את בדיקת מצב ההתראות בעת טעינת הדף
-    initializePushNotifications();
+    // בודקים שוב כל חצי דקה, בחזרה ללשונית ובפתיחת האתר
+    initializeLocalNotifications();
+    setInterval(checkUpcomingNotifications, 30000);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) checkUpcomingNotifications();
+    });
+    window.addEventListener("focus", checkUpcomingNotifications);
 
     // אתחול מצב התצוגה לפי הבחירה השמורה במכשיר
     applyTheme(localStorage.getItem(themePreferenceKey) || "light");
