@@ -85,31 +85,82 @@
     /* אזור התוכן הראשי */
     main { padding: 20px 0 40px; }
 
-    /* כפתור צדדי עדין לפתיחת ההגדרות */
-    .settings-toggle {
-      position: fixed;
-      z-index: 20;
-      top: 45%;
-      right: 0;
-      padding: 12px 8px;
-      border: 1px solid var(--line);
-      border-right: 0;
-      border-radius: 12px 0 0 12px;
-      background: var(--card);
-      color: var(--muted);
-      box-shadow: 0 2px 12px #00000012;
-      font: inherit;
-      font-size: 12px;
+    /* מיקום הכותרת והמשולשים בשני צידי החלק העליון */
+    header { position: relative; text-align: center; }
+    header .wrap { position: relative; }
+    h1, .subtitle { text-align: center; }
+    .top-triangle {
+      position: absolute;
+      top: 50%;
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border: 1px solid #ffffff45;
+      border-radius: 12px;
+      background: #ffffff12;
+      color: #ffffff;
       cursor: pointer;
-      writing-mode: vertical-rl;
+      transform: translateY(-50%);
+      transition: background .2s ease, transform .2s ease;
+    }
+    .top-triangle:hover { background: #ffffff25; }
+    .top-triangle:active { transform: translateY(-50%) scale(.96); }
+    .top-triangle::before {
+      content: "";
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+    }
+    .top-triangle.display { right: 0; }
+    .top-triangle.display::before { border-right: 11px solid currentColor; }
+    .top-triangle.alerts { left: 0; }
+    .top-triangle.alerts::before { border-left: 11px solid currentColor; }
+    .top-triangle[aria-expanded="true"] { background: #ffffff30; }
+    .top-triangle .triangle-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
     }
 
-    /* אזור ההגדרות נפתח רק לפי בקשת המשתמש */
-    .settings-panel[hidden] { display: none; }
-    .settings-panel {
+    /* לוחות ההגדרות מחליפים את אזור האירועים במקום להופיע מתחתיו */
+    .option-panel[hidden], #eventsView[hidden] { display: none; }
+    .option-panel {
       display: grid;
       gap: 12px;
-      margin-bottom: 18px;
+      margin: 0 0 18px;
+    }
+    .panel-heading {
+      margin: 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+      color: var(--text);
+      font-size: 18px;
+      text-align: center;
+    }
+    .panel-back {
+      justify-self: center;
+      padding: 8px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--muted);
+      font: inherit;
+      cursor: pointer;
+    }
+    .option-panel .theme-toggle {
+      justify-self: center;
+      margin: 0;
+      border-color: var(--field-border);
+      background: var(--primary);
+      color: #fff;
     }
 
     /* כרטיסי הסיכום */
@@ -355,31 +406,35 @@
       .filters { gap: 8px; }
       label { flex-basis: 100%; }
       .event-content { padding: 12px; }
+      header { padding: 24px 58px 20px; }
+      header .wrap { width: 100%; }
+      h1 { font-size: clamp(22px, 5vw, 30px); }
+      .subtitle { font-size: 12px; }
+      .top-triangle { width: 34px; height: 34px; }
+      .top-triangle.display { right: -48px; }
+      .top-triangle.alerts { left: -48px; }
     }
   </style>
 </head>
 <body>
   <header>
     <div class="wrap">
+      <button type="button" class="top-triangle display" id="displayToggle" aria-controls="displayPanel" aria-expanded="false" aria-label="אפשרויות תצוגה">
+        <span class="triangle-label">אפשרויות תצוגה</span>
+      </button>
+      <button type="button" class="top-triangle alerts" id="alertsToggle" aria-controls="alertsPanel" aria-expanded="false" aria-label="הגדרות התראות">
+        <span class="triangle-label">הגדרות התראות</span>
+      </button>
       <h1>לוח אירועים משפחתי</h1>
       <p class="subtitle">ימי הולדת וימי נישואין לפי התאריך העברי, עם התאריך הלועזי הקרוב</p>
-      <button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false">🌙 מצב כהה</button>
     </div>
   </header>
 
-  <button type="button" class="settings-toggle" id="settingsToggle" aria-controls="settingsPanel" aria-expanded="false">⚙ הגדרות</button>
-
   <main class="wrap">
-    <div class="list-heading">
-      <h2>האירועים הקרובים</h2>
-      <span id="resultCount"></span>
-    </div>
-    <section id="events" aria-live="polite"></section>
-
-
-
-    <section id="settingsPanel" class="settings-panel" hidden aria-label="הגדרות וסינון">
-    <section class="filters" aria-label="סינון אירועים">
+    <section id="displayPanel" class="option-panel" hidden aria-label="אפשרויות תצוגה">
+      <h2 class="panel-heading">אפשרויות תצוגה</h2>
+      <button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false">🌙 מצב כהה</button>
+      <div id="displayFilters">      <section class="filters" aria-label="סינון אירועים">
       <label>
         טווח הצגה
         <select id="range">
@@ -404,9 +459,12 @@
           <option value="all">כל המשפחות</option>
         </select>
       </label>
+    </section></div>
+      <button type="button" class="panel-back" data-close-panels>חזרה לאירועים</button>
     </section>
-
-    <section class="notifications" aria-label="הגדרות התראות">
+    <section id="alertsPanel" class="option-panel" hidden aria-label="הגדרות התראות">
+      <h2 class="panel-heading">הגדרות התראות</h2>
+      <div id="notificationOptions">      <section class="notifications" aria-label="הגדרות התראות">
       <div class="notification-info">
         <strong>🔔 תזכורות על אירועים</strong>
         <small>התראות דפדפן מקומיות בלבד. האתר חייב להישאר פתוח כדי לשלוח אותן.</small>
@@ -435,8 +493,17 @@
       <button type="button" id="enableNotifications">הפעלת התראות</button>
       <button type="button" id="testNotification">שליחת התראת בדיקה</button>
       <span id="notificationStatus" role="status">ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.</span>
+    </section></div>
+      <button type="button" class="panel-back" data-close-panels>חזרה לאירועים</button>
     </section>
-    </section>
+    <div id="eventsView">
+    <div class="list-heading">
+      <h2>האירועים הקרובים</h2>
+      <span id="resultCount"></span>
+    </div>
+    <section id="events" aria-live="polite"></section>
+
+
 
     <section class="summary" aria-label="סיכום אירועים">
       <div class="summary-card">
@@ -457,6 +524,7 @@
       החישוב מתבצע בדפדפן לפי הלוח העברי המובנה. אירועים ללא שנת לידה או נישואין מחושבים לפי היום והחודש בלבד.
       התאריך הלועזי מציין את היום שבו חל התאריך העברי, החל מהיום. התראות מקומיות נשלחות רק כאשר האתר פתוח בדפדפן ובהרשאת המשתמש.
     </p>
+    </div>
   </main>
 
   <script>
@@ -1606,14 +1674,33 @@
     document.getElementById("kind").addEventListener("change", renderEvents);
     document.getElementById("family").addEventListener("change", renderEvents);
 
-    // פתיחה וסגירה של אזור ההגדרות מהכפתור הצדדי
-    const settingsToggle = document.getElementById("settingsToggle");
-    const settingsPanel = document.getElementById("settingsPanel");
-    settingsToggle.addEventListener("click", () => {
-      const willOpen = settingsPanel.hidden;
-      settingsPanel.hidden = !willOpen;
-      settingsToggle.setAttribute("aria-expanded", String(willOpen));
-      settingsToggle.textContent = willOpen ? "× סגירת הגדרות" : "⚙ הגדרות";
+    // מעבר בין אזור האירועים לבין אפשרויות התצוגה וההתראות
+    const displayToggle = document.getElementById("displayToggle");
+    const alertsToggle = document.getElementById("alertsToggle");
+    const displayPanel = document.getElementById("displayPanel");
+    const alertsPanel = document.getElementById("alertsPanel");
+    const eventsView = document.getElementById("eventsView");
+
+    // מציגים בכל פעם לוח אחד בלבד, במקום אזור האירועים
+    function showMainPanel(panelName) {
+      const showDisplay = panelName === "display";
+      const showAlerts = panelName === "alerts";
+      displayPanel.hidden = !showDisplay;
+      alertsPanel.hidden = !showAlerts;
+      eventsView.hidden = showDisplay || showAlerts;
+      displayToggle.setAttribute("aria-expanded", String(showDisplay));
+      alertsToggle.setAttribute("aria-expanded", String(showAlerts));
+    }
+
+    // לחיצה חוזרת על אותו משולש מחזירה לרשימת האירועים
+    displayToggle.addEventListener("click", () => {
+      showMainPanel(displayPanel.hidden ? "display" : "events");
+    });
+    alertsToggle.addEventListener("click", () => {
+      showMainPanel(alertsPanel.hidden ? "alerts" : "events");
+    });
+    document.querySelectorAll("[data-close-panels]").forEach(button => {
+      button.addEventListener("click", () => showMainPanel("events"));
     });
 
     // שמירת הגדרות מצב התצוגה והחלתה בעת פתיחת האתר
