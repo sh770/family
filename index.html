@@ -358,26 +358,36 @@
       font-size: 11px;
     }
 
-    /* אזור הגדרות ההתראות */
+    /* אזור הגדרות ההתראות מסודר ברשת אחידה ללא רווחים אקראיים */
     .notifications {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-      padding: 14px;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      align-items: stretch;
+      gap: 12px;
+      padding: 16px;
       margin-bottom: 14px;
       border: 1px solid var(--line);
       border-radius: 14px;
       background: var(--card);
     }
 
-    /* כותרת והסבר של ההתראות */
-    .notification-info { flex: 1 1 220px; }
+    /* כותרת והסבר ההתראות ממורכזים לרוחב הכרטיס */
+    .notification-info {
+      grid-column: 1 / -1;
+      text-align: center;
+    }
     .notification-info strong { display: block; font-size: 14px; }
     .notification-info small { color: var(--muted); font-size: 12px; }
 
-    /* בחירת מועד ההתראה וכפתור ההפעלה */
+    /* שלושת שדות ההגדרה מקבלים רוחב שווה */
+    .notifications > label {
+      grid-column: span 2;
+      min-width: 0;
+      flex: none;
+    }
     .notifications select, .notifications input, .notifications button {
+      width: 100%;
+      min-width: 0;
       min-height: 42px;
       padding: 8px 12px;
       border: 1px solid #cbd5e1;
@@ -387,14 +397,30 @@
       font: inherit;
       font-size: 14px;
     }
+
+    /* שני כפתורי הפעולה שווים ברוחבם וממורכזים בשורה אחת */
     .notifications button {
+      grid-column: span 3;
       border-color: var(--primary);
       background: var(--primary);
       color: white;
       font-weight: 700;
       cursor: pointer;
     }
-    #notificationStatus { flex-basis: 100%; color: var(--muted); font-size: 12px; }
+    #notificationStatus {
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    /* התאמת כרטיס ההתראות למסכים צרים */
+    @media (max-width: 560px) {
+      .notifications { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .notifications > label { grid-column: span 1; }
+      .notifications > label:last-of-type { grid-column: 1 / -1; }
+      .notifications button { grid-column: span 1; }
+    }
 
     /* כפתור החלפת מצב התצוגה */
     .theme-toggle {
