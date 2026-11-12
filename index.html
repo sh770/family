@@ -85,39 +85,45 @@
     /* אזור התוכן הראשי */
     main { padding: 20px 0 40px; }
 
-    /* הכותרות ממורכזות ומשולשי הפעולה יושבים ממש בפינות העליונות */
+    /* הכותרת ממורכזת, וכפתורי המשולש מעוגנים לפינות החיצוניות של המסך */
     header { position: relative; text-align: center; overflow: hidden; }
-    header .wrap { position: relative; }
+    header .wrap { position: static; }
     h1, .subtitle { text-align: center; }
     .top-triangle {
       position: absolute;
       top: 0;
       z-index: 2;
-      width: 92px;
-      height: 92px;
+      width: 112px;
+      height: 112px;
       padding: 0;
       border: 0;
       border-radius: 0;
-      background: linear-gradient(145deg, #ffffff35, #ffffff12);
+      background: linear-gradient(145deg, #ffffff38, #ffffff12);
       color: #ffffff;
       cursor: pointer;
       transition: background .2s ease, filter .2s ease;
+    }
+    /* בפינה הימנית הצלעות הישרות צמודות למעלה ולימין והאלכסון פונה פנימה */
+    .top-triangle.display {
+      right: 0;
+      clip-path: polygon(0 0, 100% 0, 100% 100%);
+    }
+    /* בפינה השמאלית הצלעות הישרות צמודות למעלה ולשמאל והאלכסון פונה פנימה */
+    .top-triangle.alerts {
+      left: 0;
       clip-path: polygon(0 0, 100% 0, 0 100%);
     }
     .top-triangle:hover { filter: brightness(1.2); }
     .top-triangle:focus-visible { outline: 2px solid #ffffff; outline-offset: -5px; }
-    .top-triangle.display { right: 0; }
-    .top-triangle.alerts { left: 0; transform: scaleX(-1); }
-    .top-triangle[aria-expanded="true"] { background: linear-gradient(145deg, #ffffff55, #ffffff25); }
-    /* תווית אלכסונית בתוך המשולש מסבירה מה נפתח בלחיצה */
+    .top-triangle[aria-expanded="true"] { background: linear-gradient(145deg, #ffffff60, #ffffff28); }
+    /* תוויות הכפתורים מונחות לאורך האלכסון ופונות אל מרכז התוכן */
     .top-triangle .triangle-label {
       position: absolute;
-      top: 25px;
-      left: -20px;
+      top: 31px;
       display: block;
       width: 112px;
       padding: 4px 2px;
-      background: #ffffff25;
+      background: #ffffff28;
       color: #ffffff;
       font-size: 11px;
       font-weight: 700;
@@ -125,9 +131,15 @@
       text-align: center;
       white-space: nowrap;
       pointer-events: none;
+    }
+    .top-triangle.display .triangle-label {
+      left: 10px;
+      transform: rotate(45deg);
+    }
+    .top-triangle.alerts .triangle-label {
+      right: 10px;
       transform: rotate(-45deg);
     }
-    .top-triangle.alerts .triangle-label { transform: scaleX(-1) rotate(-45deg); }
 
     /* לוחות ההגדרות מחליפים את אזור האירועים במקום להופיע מתחתיו */
     .option-panel[hidden], #eventsView[hidden] { display: none; }
@@ -411,8 +423,10 @@
       header .wrap { width: 100%; }
       h1 { padding: 0 48px; font-size: clamp(22px, 5vw, 30px); }
       .subtitle { padding: 0 12px; font-size: 12px; }
-      .top-triangle { width: 72px; height: 72px; }
-      .top-triangle .triangle-label { top: 19px; left: -25px; width: 100px; font-size: 10px; }
+      .top-triangle { width: 82px; height: 82px; }
+      .top-triangle .triangle-label { top: 23px; width: 100px; font-size: 10px; }
+      .top-triangle.display .triangle-label { left: 7px; }
+      .top-triangle.alerts .triangle-label { right: 7px; }
     }
   </style>
 </head>
