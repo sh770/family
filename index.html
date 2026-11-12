@@ -82,8 +82,35 @@
       font-size: 14px;
     }
 
-    /* אזור הסינון והסיכום */
+    /* אזור התוכן הראשי */
     main { padding: 20px 0 40px; }
+
+    /* כפתור צדדי עדין לפתיחת ההגדרות */
+    .settings-toggle {
+      position: fixed;
+      z-index: 20;
+      top: 45%;
+      right: 0;
+      padding: 12px 8px;
+      border: 1px solid var(--line);
+      border-right: 0;
+      border-radius: 12px 0 0 12px;
+      background: var(--card);
+      color: var(--muted);
+      box-shadow: 0 2px 12px #00000012;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      writing-mode: vertical-rl;
+    }
+
+    /* אזור ההגדרות נפתח רק לפי בקשת המשתמש */
+    .settings-panel[hidden] { display: none; }
+    .settings-panel {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
 
     /* כרטיסי הסיכום */
     .summary {
@@ -340,22 +367,18 @@
     </div>
   </header>
 
-  <main class="wrap">
-    <section class="summary" aria-label="סיכום אירועים">
-      <div class="summary-card">
-        <span class="summary-number" id="totalCount">0</span>
-        <span class="summary-label">אירועים בתקופה שנבחרה</span>
-      </div>
-      <div class="summary-card">
-        <span class="summary-number" id="birthdayCount">0</span>
-        <span class="summary-label">ימי הולדת</span>
-      </div>
-      <div class="summary-card">
-        <span class="summary-number" id="anniversaryCount">0</span>
-        <span class="summary-label">ימי נישואין</span>
-      </div>
-    </section>
+  <button type="button" class="settings-toggle" id="settingsToggle" aria-controls="settingsPanel" aria-expanded="false">⚙ הגדרות</button>
 
+  <main class="wrap">
+    <div class="list-heading">
+      <h2>האירועים הקרובים</h2>
+      <span id="resultCount"></span>
+    </div>
+    <section id="events" aria-live="polite"></section>
+
+
+
+    <section id="settingsPanel" class="settings-panel" hidden aria-label="הגדרות וסינון">
     <section class="filters" aria-label="סינון אירועים">
       <label>
         טווח הצגה
@@ -413,12 +436,23 @@
       <button type="button" id="testNotification">שליחת התראת בדיקה</button>
       <span id="notificationStatus" role="status">ההתראות כבויות. ניתן להפעיל אותן לפי בחירתך.</span>
     </section>
+    </section>
 
-    <div class="list-heading">
-      <h2>האירועים הקרובים</h2>
-      <span id="resultCount"></span>
-    </div>
-    <section id="events" aria-live="polite"></section>
+    <section class="summary" aria-label="סיכום אירועים">
+      <div class="summary-card">
+        <span class="summary-number" id="totalCount">0</span>
+        <span class="summary-label">אירועים בתקופה שנבחרה</span>
+      </div>
+      <div class="summary-card">
+        <span class="summary-number" id="birthdayCount">0</span>
+        <span class="summary-label">ימי הולדת</span>
+      </div>
+      <div class="summary-card">
+        <span class="summary-number" id="anniversaryCount">0</span>
+        <span class="summary-label">ימי נישואין</span>
+      </div>
+    </section>
+
     <p class="note">
       החישוב מתבצע בדפדפן לפי הלוח העברי המובנה. אירועים ללא שנת לידה או נישואין מחושבים לפי היום והחודש בלבד.
       התאריך הלועזי מציין את היום שבו חל התאריך העברי, החל מהיום. התראות מקומיות נשלחות רק כאשר האתר פתוח בדפדפן ובהרשאת המשתמש.
@@ -1571,6 +1605,16 @@
     document.getElementById("range").addEventListener("change", renderEvents);
     document.getElementById("kind").addEventListener("change", renderEvents);
     document.getElementById("family").addEventListener("change", renderEvents);
+
+    // פתיחה וסגירה של אזור ההגדרות מהכפתור הצדדי
+    const settingsToggle = document.getElementById("settingsToggle");
+    const settingsPanel = document.getElementById("settingsPanel");
+    settingsToggle.addEventListener("click", () => {
+      const willOpen = settingsPanel.hidden;
+      settingsPanel.hidden = !willOpen;
+      settingsToggle.setAttribute("aria-expanded", String(willOpen));
+      settingsToggle.textContent = willOpen ? "× סגירת הגדרות" : "⚙ הגדרות";
+    });
 
     // שמירת הגדרות מצב התצוגה והחלתה בעת פתיחת האתר
     const themeToggle = document.getElementById("themeToggle");
