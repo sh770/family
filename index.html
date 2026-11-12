@@ -85,48 +85,49 @@
     /* אזור התוכן הראשי */
     main { padding: 20px 0 40px; }
 
-    /* מיקום הכותרת והמשולשים בשני צידי החלק העליון */
-    header { position: relative; text-align: center; }
+    /* הכותרות ממורכזות ומשולשי הפעולה יושבים ממש בפינות העליונות */
+    header { position: relative; text-align: center; overflow: hidden; }
     header .wrap { position: relative; }
     h1, .subtitle { text-align: center; }
     .top-triangle {
       position: absolute;
-      top: 50%;
-      display: grid;
-      place-items: center;
-      width: 42px;
-      height: 42px;
+      top: 0;
+      z-index: 2;
+      width: 92px;
+      height: 92px;
       padding: 0;
-      border: 1px solid #ffffff45;
-      border-radius: 12px;
-      background: #ffffff12;
+      border: 0;
+      border-radius: 0;
+      background: linear-gradient(145deg, #ffffff35, #ffffff12);
       color: #ffffff;
       cursor: pointer;
-      transform: translateY(-50%);
-      transition: background .2s ease, transform .2s ease;
+      transition: background .2s ease, filter .2s ease;
+      clip-path: polygon(0 0, 100% 0, 0 100%);
     }
-    .top-triangle:hover { background: #ffffff25; }
-    .top-triangle:active { transform: translateY(-50%) scale(.96); }
-    .top-triangle::before {
-      content: "";
-      width: 0;
-      height: 0;
-      border-top: 8px solid transparent;
-      border-bottom: 8px solid transparent;
-    }
+    .top-triangle:hover { filter: brightness(1.2); }
+    .top-triangle:focus-visible { outline: 2px solid #ffffff; outline-offset: -5px; }
     .top-triangle.display { right: 0; }
-    .top-triangle.display::before { border-right: 11px solid currentColor; }
-    .top-triangle.alerts { left: 0; }
-    .top-triangle.alerts::before { border-left: 11px solid currentColor; }
-    .top-triangle[aria-expanded="true"] { background: #ffffff30; }
+    .top-triangle.alerts { left: 0; transform: scaleX(-1); }
+    .top-triangle[aria-expanded="true"] { background: linear-gradient(145deg, #ffffff55, #ffffff25); }
+    /* תווית אלכסונית בתוך המשולש מסבירה מה נפתח בלחיצה */
     .top-triangle .triangle-label {
       position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
+      top: 25px;
+      left: -20px;
+      display: block;
+      width: 112px;
+      padding: 4px 2px;
+      background: #ffffff25;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.3;
+      text-align: center;
       white-space: nowrap;
+      pointer-events: none;
+      transform: rotate(-45deg);
     }
+    .top-triangle.alerts .triangle-label { transform: scaleX(-1) rotate(-45deg); }
 
     /* לוחות ההגדרות מחליפים את אזור האירועים במקום להופיע מתחתיו */
     .option-panel[hidden], #eventsView[hidden] { display: none; }
@@ -406,24 +407,23 @@
       .filters { gap: 8px; }
       label { flex-basis: 100%; }
       .event-content { padding: 12px; }
-      header { padding: 24px 58px 20px; }
+      header { padding: 24px 16px 20px; }
       header .wrap { width: 100%; }
-      h1 { font-size: clamp(22px, 5vw, 30px); }
-      .subtitle { font-size: 12px; }
-      .top-triangle { width: 34px; height: 34px; }
-      .top-triangle.display { right: -48px; }
-      .top-triangle.alerts { left: -48px; }
+      h1 { padding: 0 48px; font-size: clamp(22px, 5vw, 30px); }
+      .subtitle { padding: 0 12px; font-size: 12px; }
+      .top-triangle { width: 72px; height: 72px; }
+      .top-triangle .triangle-label { top: 19px; left: -25px; width: 100px; font-size: 10px; }
     }
   </style>
 </head>
 <body>
   <header>
     <div class="wrap">
-      <button type="button" class="top-triangle display" id="displayToggle" aria-controls="displayPanel" aria-expanded="false" aria-label="אפשרויות תצוגה">
-        <span class="triangle-label">אפשרויות תצוגה</span>
+      <button type="button" class="top-triangle display" id="displayToggle" aria-controls="displayPanel" aria-expanded="false" aria-label="פתיחת אפשרויות תצוגה" title="פתיחת אפשרויות תצוגה">
+        <span class="triangle-label">תצוגה</span>
       </button>
-      <button type="button" class="top-triangle alerts" id="alertsToggle" aria-controls="alertsPanel" aria-expanded="false" aria-label="הגדרות התראות">
-        <span class="triangle-label">הגדרות התראות</span>
+      <button type="button" class="top-triangle alerts" id="alertsToggle" aria-controls="alertsPanel" aria-expanded="false" aria-label="פתיחת הגדרות התראות" title="פתיחת הגדרות התראות">
+        <span class="triangle-label">התראות</span>
       </button>
       <h1>לוח אירועים משפחתי</h1>
       <p class="subtitle">ימי הולדת וימי נישואין לפי התאריך העברי, עם התאריך הלועזי הקרוב</p>
